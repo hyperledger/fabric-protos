@@ -25,10 +25,6 @@ enum Status {
 }
 
 enum HeaderType {
-    // Prevent removed tag re-use
-    // Uncomment after fabric-baseimage moves to 3.5.1
-    // reserved 7;
-    // reserved "PEER_RESOURCE_UPDATE";
     reserved 7, 9;
     reserved "PEER_RESOURCE_UPDATE", "TOKEN_TRANSACTION";
 
