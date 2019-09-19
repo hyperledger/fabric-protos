@@ -42,7 +42,7 @@ steps:
     go build ./...
     git diff --color
 
-- template: ci/merge-forward.yml
+- template: merge-forward.yml
   parameters:
     repo: fabric-protos-go
     branch: $(branch)
