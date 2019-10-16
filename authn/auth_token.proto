@@ -1,0 +1,32 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric-protos-go/authn";
+option java_package = "org.hyperledger.fabric.protos.authn";
+
+package authn;
+
+message TokenRequest {
+	// Serialized msp.SerializedIdentity.
+	bytes identity = 1;
+	// Arbitrary number that may only be used once.
+	bytes nonce = 2;
+}
+
+message SignedTokenRequest {
+	// Serialized TokenRequest
+	bytes token_request = 1;
+	// Signature on token_request
+	bytes signature = 2;
+}
+
+message TokenResponse {
+	bytes token = 1;
+}
+
+service Authentication {
+	rpc GetToken(SignedTokenRequest) returns (TokenResponse);
+}
