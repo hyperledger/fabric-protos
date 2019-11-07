@@ -59,6 +59,9 @@ message StaticCollectionConfig {
     // write the data (if set to false, for example if you want to implement more granular
     // access logic in the chaincode)
     bool member_only_write = 7;
+    // a reference to a policy residing / managed in the config block
+    // to define the endorsement policy for this collection
+    ApplicationPolicy endorsement_policy= 8;
 }
 
 
