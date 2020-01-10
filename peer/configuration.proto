@@ -32,3 +32,9 @@ message APIResource {
 message ACLs {
     map<string, APIResource> acls = 1;
 }
+
+// PrivateDataImplicitCollection stores the configuration for org-specific implicit collections
+message PrivateDataImplicitCollection {
+    int32 max_peer_count = 1;
+    int32 required_peer_count = 2;
+}
