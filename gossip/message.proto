@@ -175,6 +175,7 @@ message ConnEstablish {
     bytes pki_id          = 1;
     bytes identity        = 2;
     bytes tls_cert_hash   = 3;
+    bool probe            = 4;
 }
 
 // PeerIdentity defines the identity of the peer
