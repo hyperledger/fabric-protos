@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ARG DEBIAN_BASE=buster
-ARG GO_VER=1.12.7
+ARG GO_VER=1.14.1
 ARG PROTOC_VER=1.3.2
-ARG PROTOTOOL_VER=1.8.0
+ARG PROTOTOOL_VER=1.9.0
 
 FROM golang:${GO_VER}-${DEBIAN_BASE} as golang
 RUN mkdir -p /tools
