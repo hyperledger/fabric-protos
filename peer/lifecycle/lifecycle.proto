@@ -161,6 +161,26 @@ message CheckCommitReadinessResult{
     map<string, bool> approvals = 1;
 }
 
+// QueryApprovedChaincodeDefinitionArgs is the message used as arguments to
+// `_lifecycle.QueryApprovedChaincodeDefinition`.
+message QueryApprovedChaincodeDefinitionArgs {
+    string name = 1;
+    int64 sequence = 2;
+}
+
+// QueryApprovedChaincodeDefinitionResult is the message returned by
+// `_lifecycle.QueryApprovedChaincodeDefinition`.
+message QueryApprovedChaincodeDefinitionResult {
+    int64 sequence = 1;
+    string version = 2;
+    string endorsement_plugin = 3;
+    string validation_plugin = 4;
+    bytes validation_parameter = 5;
+    protos.CollectionConfigPackage collections = 6;
+    bool init_required = 7;
+    ChaincodeSource source = 8;
+}
+
 // QueryChaincodeDefinitionArgs is the message used as arguments to
 // `_lifecycle.QueryChaincodeDefinition`.
 message QueryChaincodeDefinitionArgs {
