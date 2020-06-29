@@ -8,11 +8,10 @@ ARG PROTOC_VER=1.3.2
 ARG PROTOTOOL_VER=1.9.0
 
 FROM golang:${GO_VER}-${DEBIAN_BASE} as golang
-RUN mkdir -p /tools
 WORKDIR /tools
 ARG PROTOC_VER
 RUN git clone -q -c advice.detachedHead=false -b v${PROTOC_VER} --depth 1 https://github.com/golang/protobuf
-WORKDIR protobuf
+WORKDIR /tools/protobuf
 RUN GOBIN=/usr/local/bin go install ./protoc-gen-go
 
 FROM debian:${DEBIAN_BASE} as prototool
