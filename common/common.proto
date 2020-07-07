@@ -25,8 +25,8 @@ enum Status {
 }
 
 enum HeaderType {
-    reserved 7, 9;
-    reserved "PEER_RESOURCE_UPDATE", "TOKEN_TRANSACTION";
+    reserved 7, 8, 9;
+    reserved "PEER_RESOURCE_UPDATE", "PEER_ADMIN_OPERATION", "TOKEN_TRANSACTION";
 
     MESSAGE = 0;                     // Used for messages which are signed but opaque
     CONFIG = 1;                      // Used for messages which express the channel config
@@ -35,7 +35,6 @@ enum HeaderType {
     ORDERER_TRANSACTION = 4;         // Used internally by the orderer for management
     DELIVER_SEEK_INFO = 5;           // Used as the type for Envelope messages submitted to instruct the Deliver API to seek
     CHAINCODE_PACKAGE = 6;           // Used for packaging chaincode artifacts for install
-    PEER_ADMIN_OPERATION = 8;        // Used for invoking an administrative operation on a peer
 }
 
 // This enum enlists indexes of the block metadata array
