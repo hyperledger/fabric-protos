@@ -23,24 +23,7 @@ steps:
   clean: true
   fetchDepth: 1
 
-- script: |
-    set -eu -o pipefail
-    prototool lint
-    [ -d build/fabric-protos-go/.git ] || git clone https://github.com/hyperledger/fabric-protos-go.git build/fabric-protos-go
-    (
-        cd build/fabric-protos-go
-        git show-branch $(branch) > /dev/null 2>&1 || git branch $(branch)
-        git checkout $(branch)
-        if git ls-remote --heads --exit-code origin $(branch); then
-            git pull origin $(branch)
-        fi
-    )
-    ci/cleanup_generated.sh build/fabric-protos-go
-    ci/compile_go_protos.sh
-    cd build/fabric-protos-go
-    go mod tidy
-    go build ./...
-    git diff --color
+- script: ci/build.sh "$(branch)"
 
 - template: merge-forward.yml
   parameters:
