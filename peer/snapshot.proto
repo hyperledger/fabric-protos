@@ -1,0 +1,22 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric-protos-go/peer";
+option java_package = "org.hyperledger.fabric.protos.peer";
+
+package protos;
+
+// SnapshotInterest contains information of snapshot requests
+message SnapshotInterest {
+    // requests contain a list of pending snapshot requests
+    repeated SnapshotRequest requests = 1;
+}
+
+// SnapshotRequest contains information for a snapshot request
+message SnapshotRequest {
+    // height specifies the blockchain height to generate the snapshot
+    uint64 height = 1;
+}
