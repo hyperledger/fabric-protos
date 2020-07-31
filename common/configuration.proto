@@ -9,10 +9,11 @@ option java_package = "org.hyperledger.fabric.protos.common";
 
 package common;
 
-// HashingAlgorithm is encoded into the configuration transaction as  a configuration item of type Chain
-// with a Key of "HashingAlgorithm" and a Value of  HashingAlgorithm as marshaled protobuf bytes
+// HashingAlgorithm is encoded into the configuration transaction as a
+// configuration item of type Chain with a Key of "HashingAlgorithm" and a
+// Value of HashingAlgorithm as marshaled protobuf bytes
 message HashingAlgorithm {
-    // Currently supported algorithms are: SHAKE256
+    // SHA256 is currently the only supported and tested algorithm.
     string name = 1;
 }
 
