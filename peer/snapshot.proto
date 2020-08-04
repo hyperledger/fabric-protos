@@ -1,0 +1,45 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric-protos-go/peer";
+option java_package = "org.hyperledger.fabric.protos.peer";
+
+package protos;
+
+import "google/protobuf/empty.proto";
+
+// SnapshotRequest contains information for a generate/cancel snapshot request
+message SnapshotRequest {
+    string channel_id = 1;
+    uint64 height = 2;
+}
+
+// SnapshotQuery contains information for a query snapshot request
+message SnapshotQuery {
+    string channel_id = 1;
+}
+
+// SignedSnapshotRequest contains marshalled request bytes and signature
+message SignedSnapshotRequest {
+    // The bytes of SnapshotRequest or SnapshotQuery
+    bytes request = 1;
+    // Signaure over request bytes; this signature is to be verified against the creator identity
+    bytes signature = 2;
+}
+
+// QueryPendingSnapshotsResponse specifies the response payload of a query pending snapshots request
+message QueryPendingSnapshotsResponse {
+    repeated uint64 heights = 1;
+}
+
+service Snapshot {
+    // Generate a snapshot reqeust. SignedSnapshotRequest contains marshalled bytes for SnaphostRequest
+    rpc Generate(SignedSnapshotRequest) returns (google.protobuf.Empty) {}
+    // Cancel a snapshot reqeust. SignedSnapshotRequest contains marshalled bytes for SnaphostRequest
+    rpc Cancel(SignedSnapshotRequest) returns (google.protobuf.Empty) {}
+    // Query pending snapshots query. SignedSnapshotRequest contains marshalled bytes for SnaphostQuery
+    rpc QueryPendings(SignedSnapshotRequest) returns (QueryPendingSnapshotsResponse) {}
+}
