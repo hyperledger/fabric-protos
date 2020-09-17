@@ -26,11 +26,15 @@ message SeekSpecified {
     uint64 number = 1;
 }
 
+// SeekNextCommit refers to the next block that will be committed
+message SeekNextCommit { }
+
 message SeekPosition {
     oneof Type {
         SeekNewest newest = 1;
         SeekOldest oldest = 2;
         SeekSpecified specified = 3;
+        SeekNextCommit next_commit = 4;
     }
 }
 
