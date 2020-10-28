@@ -17,10 +17,10 @@ message BlockchainInfo {
     bytes previousBlockHash = 3;
     // Specifies bootstrapping snapshot info if the channel is bootstrapped from a snapshot.
     // It is nil if the channel is not bootstrapped from a snapshot.
-    BootstrappingSnapshotInfo bootstrapping_snapshot_info = 4;
+    BootstrappingSnapshotInfo bootstrappingSnapshotInfo = 4;
 }
 
 // Contains information for the bootstrapping snapshot.
 message BootstrappingSnapshotInfo {
-    uint64 last_block_in_snapshot = 1;
+    uint64 lastBlockInSnapshot = 1;
 }
