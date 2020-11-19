@@ -16,4 +16,3 @@ fi
 for protos in $(find . -name '*.proto' -exec dirname {} \; | sort -u); do
   protoc "--go_out=plugins=grpc,paths=source_relative:$repo" "$protos"/*.proto
 done
-

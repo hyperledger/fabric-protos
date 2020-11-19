@@ -9,6 +9,8 @@ steps:
     sshPublicKey: ${{ parameters.public_key }}
     sshKeySecureFile: ${{ parameters.deploy_key }}
   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  displayName: Install SSH Key
+
 - script: |
     set -eu -o pipefail
     cd build/${{ parameters.repo }}
@@ -19,3 +21,4 @@ steps:
     git diff --cached --quiet || git commit -m "$BUILD_SOURCEVERSIONMESSAGE" --no-edit
     git push origin ${{ parameters.branch }}
   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  displayName: Merge Forward
