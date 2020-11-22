@@ -24,10 +24,11 @@ prototool lint
   find ./* -type d -empty -delete
 )
 
-ci/compile_go_protos.sh
+ci/scripts/compile_go_protos.sh
 cd build/fabric-protos-go
 go mod tidy
 go build ./...
 
 git add -A .
 git diff --color --cached
+cat go.mod

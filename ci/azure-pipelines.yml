@@ -4,30 +4,44 @@
 
 name: $(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rrr)
 trigger:
-  batch: false
   branches:
     include:
     - master
     - release-*
 
 variables:
-  branch: $[ coalesce(variables['system.PullRequest.TargetBranch'], variables['build.SourceBranchName']) ]
+  BRANCH: $[ coalesce(variables['system.PullRequest.TargetBranch'], variables['build.SourceBranchName']) ]
+  GOBIN: $(Agent.BuildDirectory)/go/bin
+  GO_VER: 1.15.5
+  PATH: $(Agent.BuildDirectory)/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+  PROTOC_VER: 1.4.3
+  PROTOTOOL_VER: 1.10.0
 
 pool:
-  vmImage: ubuntu-16.04
-container:
-  image: sykesm/fabric-protos:0.2
+  vmImage: ubuntu-20.04
 
 steps:
-- checkout: self
-  clean: true
-  fetchDepth: 1
+  - checkout: self
+    clean: true
+    fetchDepth: 1
 
-- script: ci/build.sh "$(branch)"
+  - task: GoTool@0
+    displayName: Install Go
+    inputs:
+      version: $(GO_VER)
 
-- template: merge-forward.yml
-  parameters:
-    repo: fabric-protos-go
-    branch: $(branch)
-    deploy_key: fabric-protos-go-deploy.key
-    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6oJcGtQmLT+uDIzMzkUpNiHVTFVthEOhHRamQ/z7k9+peQSXoI5c2zd6mMgygo2G+U/NrphQRAAU5ToxfQMV/B/wWKisCXr1F5DrNfBfSh127nHptZZDJR/PDEHbx3lkARZF9dlK4SsFofwd51uHc9nPdK54pSmEcKI62By4lQPIIcbumoviAbUpEkTdEoPz+VBUYTdqfSBfBfS5CS/L/Xl6aUdPbe4jtxZ+grMX93f3+itxGsQehnIwSNWkAENcMa8np/sMKVs3ER0GxgGbfDOMZCxYBPOuleUb7h/+N1IDsB83cIZ89gHDUAsrrYLmVlLD8I/dMK3vIP8/iPHH8SrJvjxbj+B86BKAKTFXtA8mOcy2WxBoPiIVWwNYCufh4sDeB/H/OM/cmISaYv7l+EHGTU3/LBHD3YGaBvrptQN9hMjSS0Z1wGg1svMEt3kNwNE44RNo1eDb+fnkoXm5D3NNv4ELhSkYS4OKGoD3FQtoOs5G6LMHXqEB0M7kVngv4SX5FIPVbnGBLubi8bfgNR+CN4xMDWYk+rPk3DmkHbs6DV+yPhQUvtbSOhIH2C12R288onaEc3Lr67c53AlC1B/Zne7ZSBKIvE6jZzwIcH/qbICyX86yTvxUMNOUEVqgoUSxN3yjZVtQAMke4sPOka087IL+ed67qrhhAviSnpw== fabric-build@hyperledger.org
+  - script: ci/scripts/install_deps.sh
+    displayName: Install Deps
+    env:
+      protoc_ver: $(PROTOC_VER)
+      prototool_ver: $(PROTOTOOL_VER)
+
+  - script: ci/scripts/build.sh "$(BRANCH)"
+    displayName: Build Protos
+
+  - template: merge-forward.yml
+    parameters:
+      repo: fabric-protos-go
+      branch: $(BRANCH)
+      deploy_key: fabric-protos-go-deploy.key
+      public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6oJcGtQmLT+uDIzMzkUpNiHVTFVthEOhHRamQ/z7k9+peQSXoI5c2zd6mMgygo2G+U/NrphQRAAU5ToxfQMV/B/wWKisCXr1F5DrNfBfSh127nHptZZDJR/PDEHbx3lkARZF9dlK4SsFofwd51uHc9nPdK54pSmEcKI62By4lQPIIcbumoviAbUpEkTdEoPz+VBUYTdqfSBfBfS5CS/L/Xl6aUdPbe4jtxZ+grMX93f3+itxGsQehnIwSNWkAENcMa8np/sMKVs3ER0GxgGbfDOMZCxYBPOuleUb7h/+N1IDsB83cIZ89gHDUAsrrYLmVlLD8I/dMK3vIP8/iPHH8SrJvjxbj+B86BKAKTFXtA8mOcy2WxBoPiIVWwNYCufh4sDeB/H/OM/cmISaYv7l+EHGTU3/LBHD3YGaBvrptQN9hMjSS0Z1wGg1svMEt3kNwNE44RNo1eDb+fnkoXm5D3NNv4ELhSkYS4OKGoD3FQtoOs5G6LMHXqEB0M7kVngv4SX5FIPVbnGBLubi8bfgNR+CN4xMDWYk+rPk3DmkHbs6DV+yPhQUvtbSOhIH2C12R288onaEc3Lr67c53AlC1B/Zne7ZSBKIvE6jZzwIcH/qbICyX86yTvxUMNOUEVqgoUSxN3yjZVtQAMke4sPOka087IL+ed67qrhhAviSnpw== fabric-build@hyperledger.org
