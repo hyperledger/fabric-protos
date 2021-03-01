@@ -12,70 +12,109 @@ option java_outer_classname = "GatewayProto";
 package gateway;
 
 import "peer/proposal.proto";
+import "peer/proposal_response.proto";
+import "peer/transaction.proto";
 import "common/common.proto";
 
 // The Gateway API for evaluating and submitting transactions via the gateway.
 // Transaction evaluation (query) requires the invocation of the Evaluate service
 // Transaction submission (ledger updates) is a two step process invoking Endorse
-// followed by Submit.  The proposal and transaction must be signed by the client
-// before each step.
+// followed by Submit. A third step, invoking CommitStatus, is required if the
+// clients wish to wait for a Transaction to be committed.
+// The proposal and transaction must be signed by the client before each step.
 service Gateway {
-    // The Endorse service passes the ProposedTransaction (which contains the signed proposal)
-    // to the gateway in order to obtain sufficient endorsement.
+    // The Endorse service passes a proposed transaction to the gateway in order to
+    // obtain sufficient endorsement.
     // The gateway will determine the endorsement plan for the requested chaincode and
     // forward to the appropriate peers for endorsement. It will return to the client a
-    // PreparedTransaction message which contains a Envelope message as defined
-    // in fabric-protos/common/common.proto.  The client must sign the contents of this
-    // envelope before invoking the Submit service
-    rpc Endorse(ProposedTransaction) returns (PreparedTransaction);
+    // prepared transaction in the form of an Envelope message as defined
+    // in common/common.proto. The client must sign the contents of this envelope
+    // before invoking the Submit service
+    rpc Endorse(EndorseRequest) returns (EndorseResponse);
 
-    // Ths Submit service will process the PreparedTransaction message returned from Endorse service
-    // once it has been signed by the client. A stream is opened to return multiple return values.
-    // - The Gateway will register transaction event listeners for the given channel/txId.
-    // - It will then broadcast the Envelope to the ordering service.
-    // - The success/error response is passed back to the client in the stream
-    // - The Gateway awaits sufficient transaction commit events before returning and closing the stream,
-    //   indicating to the client that transaction has been committed.
-    rpc Submit(PreparedTransaction) returns (stream Event);
+    // The Submit service will process the prepared transaction returned from Endorse service
+    // once it has been signed by the client. It will wait for the transaction to be submitted to the
+    // ordering service but the client must invoke the CommitStatus service to wait for the transaction
+    // to be committed.
+    rpc Submit(SubmitRequest) returns (SubmitResponse);
 
-    // The Evaluate service passes the ProposedTransaction (which contains the signed proposal)
-    // to the gateway in order to invoke the transaction function and return the result to the client.
-    // No ledger updates are make.  The gateway will select an appropriate peer to query based on
-    // block height and load.
-    rpc Evaluate(ProposedTransaction) returns (Result);
+    // The CommitStatus service will indicate whether a prepared transaction previously submitted to
+    // the Submit sevice has been committed. It will wait for the commit to occur if it hasn’t already
+    // committed.
+    rpc CommitStatus(CommitStatusRequest) returns (CommitStatusResponse);
+
+    // The Evaluate service passes a proposed transaction to the gateway in order to invoke the
+    // transaction function and return the result to the client. No ledger updates are made.
+    // The gateway will select an appropriate peer to query based on block height and load.
+    rpc Evaluate(EvaluateRequest) returns (EvaluateResponse);
 }
 
-// Result is the value that is returned by the transaction function.
-message Result {
-    // The byte array returned from the chaincode invocation.
-    bytes value = 1;
+// EndorseRequest contains the details required to obtain sufficient endorsements for a
+// transaction to be committed to the ledger.
+message EndorseRequest {
+    // The unique identifier for the transaction.
+    string transaction_id = 1;
+    // Identifier of the channel this request is bound for.
+    string channel_id = 2;
+    // The signed proposal ready for endorsement.
+    protos.SignedProposal proposed_transaction = 3;
 }
 
-// ProposedTransaction contains the signed proposal ready for endorsement plus any processing options.
-message ProposedTransaction {
-    // The signed proposal.
-    protos.SignedProposal proposal = 1;
-    // Other options will be added here.  The following are experimental at the moment.
-    string tx_id = 2;
-    string channel_id = 3;
+// EndorseResponse returns the result of endorsing a transaction.
+message EndorseResponse {
+    // The response that is returned by the transaction function, as defined
+    // in peer/proposal_response.proto
+    protos.Response result = 1;
+    // The unsigned set of transaction responses from the endorsing peers for signing by the client
+    // before submitting to ordering service (via gateway).
+    common.Envelope prepared_transaction = 2;
 }
 
-// PreparedTransaction contains the set of transaction responses from the endorsing peers for signing by the client
-// before submitting to ordering service (via gateway).
-message PreparedTransaction {
-    // The transaction envelope.
-    common.Envelope envelope = 1;
-    // The value that is returned by the transaction function during endorsement.
-    Result response = 2;
-    // The following fields are pulled out of the envelope to the top level for convenience to the client.
-    string tx_id = 3;
-    string channel_id = 4;
+// SubmitRequest contains the details required to submit a transaction (update the ledger).
+message SubmitRequest {
+    // Identifier of the transaction to submit.
+    string transaction_id = 1;
+    // Identifier of the channel this request is bound for.
+    string channel_id = 2;
+    // The signed set of endorsed transaction responses to submit.
+    common.Envelope prepared_transaction = 3;
 }
 
-// Event contains the data returned in the stream from the Submit service.
-// This is currently experimental and highly likely to change during gateway development.
-message Event {
-    bytes value = 1;
+// SubmitResponse returns the result of submitting a transaction.
+message SubmitResponse {
+    // Nothing yet
+}
+
+// CommitStatusRequest contains the details required to check whether a transaction has been
+// successfully committed.
+message CommitStatusRequest {
+    // Identifier of the transaction to check.
+    string transaction_id = 1;
+    // Identifier of the channel this request is bound for.
+    string channel_id = 2;
+}
+
+// CommitStatusResponse returns the result of committing a transaction.
+message CommitStatusResponse {
+    // The result of the transaction commit, as defined in peer/transaction.proto
+    protos.TxValidationCode result = 1;
+}
+
+// EvaluateRequest contains the details required to evaluate a transaction (query the ledger).
+message EvaluateRequest {
+    // Identifier of the transaction to evaluate.
+    string transaction_id = 1;
+    // Identifier of the channel this request is bound for.
+    string channel_id = 2;
+    // The signed proposal ready for evaluation.
+    protos.SignedProposal proposed_transaction = 3;
+}
+
+// EvaluateResponse returns the result of evaluating a transaction.
+message EvaluateResponse {
+    // The response that is returned by the transaction function, as defined
+    // in peer/proposal_response.proto
+    protos.Response result = 1;
 }
 
 // If any of the functions in the Gateway service returns an error, then it will be in the format of
