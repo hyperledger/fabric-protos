@@ -9,7 +9,7 @@ option java_multiple_files = true;
 option java_package = "org.hyperledger.fabric.protos.gateway";
 option java_outer_classname = "GatewayProto";
 
-package protos;
+package gateway;
 
 import "peer/proposal.proto";
 import "common/common.proto";
@@ -54,7 +54,7 @@ message Result {
 // ProposedTransaction contains the signed proposal ready for endorsement plus any processing options.
 message ProposedTransaction {
     // The signed proposal.
-    SignedProposal proposal = 1;
+    protos.SignedProposal proposal = 1;
     // Other options will be added here.  The following are experimental at the moment.
     string tx_id = 2;
     string channel_id = 3;
