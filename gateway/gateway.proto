@@ -147,4 +147,7 @@ message PreparedTransaction {
     string transaction_id = 1;
     // The transaction envelope.
     common.Envelope envelope = 2;
+    // The response that is returned by the transaction function during endorsement, as defined
+    // in peer/proposal_response.proto
+    protos.Response result = 3;
 }
