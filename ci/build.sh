@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -eu -o pipefail
-branch="${1:-master}"
+branch="${1:-main}"
 
 # Lint the protocol buffers
 prototool lint
