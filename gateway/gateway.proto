@@ -41,7 +41,7 @@ service Gateway {
     // The CommitStatus service will indicate whether a prepared transaction previously submitted to
     // the Submit sevice has been committed. It will wait for the commit to occur if it hasn’t already
     // committed.
-    rpc CommitStatus(CommitStatusRequest) returns (CommitStatusResponse);
+    rpc CommitStatus(SignedCommitStatusRequest) returns (CommitStatusResponse);
 
     // The Evaluate service passes a proposed transaction to the gateway in order to invoke the
     // transaction function and return the result to the client. No ledger updates are made.
@@ -85,6 +85,15 @@ message SubmitResponse {
     // Nothing yet
 }
 
+// SignedCommitStatusRequest contains a serialized CommitStatusRequest message, and a digital signature for the
+// serialized request message.
+message SignedCommitStatusRequest {
+    // Serialized CommitStatusRequest message
+    bytes request = 1;
+    // Signature for request message.
+    bytes signature = 2;
+}
+
 // CommitStatusRequest contains the details required to check whether a transaction has been
 // successfully committed.
 message CommitStatusRequest {
@@ -92,6 +101,8 @@ message CommitStatusRequest {
     string transaction_id = 1;
     // Identifier of the channel this request is bound for.
     string channel_id = 2;
+    // Client requestor identity.
+    bytes identity = 3;
 }
 
 // CommitStatusResponse returns the result of committing a transaction.
