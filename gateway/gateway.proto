@@ -58,6 +58,9 @@ message EndorseRequest {
     string channel_id = 2;
     // The signed proposal ready for endorsement.
     protos.SignedProposal proposed_transaction = 3;
+    // If targeting the peers of specific organizations (e.g. for private data scenarios),
+    // the list of organizations should be supplied here.
+    repeated string endorsing_organizations = 4;
 }
 
 // EndorseResponse returns the result of endorsing a transaction.
