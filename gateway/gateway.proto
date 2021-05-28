@@ -66,7 +66,7 @@ message EndorseRequest {
     // The signed proposal ready for endorsement.
     protos.SignedProposal proposed_transaction = 3;
     // If targeting the peers of specific organizations (e.g. for private data scenarios),
-    // the list of organizations should be supplied here.
+    // the list of organizations' MSPIDs should be supplied here.
     repeated string endorsing_organizations = 4;
 }
 
@@ -131,6 +131,9 @@ message EvaluateRequest {
     string channel_id = 2;
     // The signed proposal ready for evaluation.
     protos.SignedProposal proposed_transaction = 3;
+    // If targeting the peers of specific organizations (e.g. for private data scenarios),
+    // the list of organizations' MSPIDs should be supplied here.
+    repeated string target_organizations = 4;
 }
 
 // EvaluateResponse returns the result of evaluating a transaction.
@@ -190,6 +193,8 @@ message ProposedTransaction {
     string transaction_id = 1;
     // The signed proposal.
     protos.SignedProposal proposal = 2;
+    // The list of endorsing organizations.
+    repeated string endorsing_organizations = 3;
 }
 
 // PreparedTransaction contains the details required for offline signing prior to submitting a transaction.
