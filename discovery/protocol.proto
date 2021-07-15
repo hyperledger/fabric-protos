@@ -11,6 +11,7 @@ package discovery;
 
 import "gossip/message.proto";
 import "msp/msp_config.proto";
+import "peer/proposal_response.proto";
 
 // Discovery defines a service that serves information about the fabric network
 // like which peers, orderers, chaincodes, etc.
@@ -128,7 +129,7 @@ message ConfigResult {
 // chaincodes that are installed on peers and collection
 // access control policies.
 message PeerMembershipQuery {
-    ChaincodeInterest filter = 1;
+    protos.ChaincodeInterest filter = 1;
 }
 
 // PeerMembershipResult contains peers mapped by their organizations (MSP_ID)
@@ -141,23 +142,7 @@ message PeerMembershipResult {
 // Each invocation is a separate one, and the endorsement policy
 // is evaluated independantly for each given interest.
 message ChaincodeQuery {
-    repeated ChaincodeInterest interests = 1;
-}
-
-// ChaincodeInterest defines an interest about an endorsement
-// for a specific single chaincode invocation.
-// Multiple chaincodes indicate chaincode to chaincode invocations.
-message ChaincodeInterest {
-    repeated ChaincodeCall chaincodes = 1;
-}
-
-// ChaincodeCall defines a call to a chaincode.
-// It may have collections that are related to the chaincode
-message ChaincodeCall {
-    string name = 1;
-    repeated string collection_names = 2;
-    bool no_private_reads = 3; // Indicates we do not need to read from private data
-    bool no_public_writes = 4; // Indicates we do not need to write to the chaincode namespace
+    repeated protos.ChaincodeInterest interests = 1;
 }
 
 // ChaincodeQueryResult contains EndorsementDescriptors for
