@@ -114,5 +114,8 @@ message ChaincodeCall {
     // The set of signature policies associated with states in the write-set
     // that have state-based endorsement policies.
     repeated common.SignaturePolicyEnvelope key_policies = 5;
+
+    // Indicates we wish to ignore the namespace endorsement policy
+    bool disregard_namespace_policy = 6;
 }
 
