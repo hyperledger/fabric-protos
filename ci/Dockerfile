@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 ARG DEBIAN_BASE=buster
-ARG GO_VER=1.14.1
+ARG GO_VER=1.16.7
 ARG PROTOC_VER=1.3.2
 ARG PROTOTOOL_VER=1.9.0
 
