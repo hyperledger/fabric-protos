@@ -11,6 +11,7 @@ option java_outer_classname = "GatewayProto";
 
 package gateway;
 
+import "peer/chaincode_event.proto";
 import "peer/proposal.proto";
 import "peer/proposal_response.proto";
 import "peer/transaction.proto";
@@ -29,7 +30,7 @@ service Gateway {
     // forward to the appropriate peers for endorsement. It will return to the client a
     // prepared transaction in the form of an Envelope message as defined
     // in common/common.proto. The client must sign the contents of this envelope
-    // before invoking the Submit service
+    // before invoking the Submit service.
     rpc Endorse(EndorseRequest) returns (EndorseResponse);
 
     // The Submit service will process the prepared transaction returned from Endorse service
@@ -41,12 +42,18 @@ service Gateway {
     // The CommitStatus service will indicate whether a prepared transaction previously submitted to
     // the Submit sevice has been committed. It will wait for the commit to occur if it hasn’t already
     // committed.
-    rpc CommitStatus(CommitStatusRequest) returns (CommitStatusResponse);
+    rpc CommitStatus(SignedCommitStatusRequest) returns (CommitStatusResponse);
 
     // The Evaluate service passes a proposed transaction to the gateway in order to invoke the
     // transaction function and return the result to the client. No ledger updates are made.
     // The gateway will select an appropriate peer to query based on block height and load.
     rpc Evaluate(EvaluateRequest) returns (EvaluateResponse);
+
+    // The ChaincodeEvents service supplies a stream of responses, each containing all the events emitted by the
+    // requested chaincode for a specific block. The streamed responses are ordered by ascending block number. Responses
+    // are only returned for blocks that contain the requested events, while blocks not containing any of the requested
+    // events are skipped.
+    rpc ChaincodeEvents(SignedChaincodeEventsRequest) returns (stream ChaincodeEventsResponse);
 }
 
 // EndorseRequest contains the details required to obtain sufficient endorsements for a
@@ -58,12 +65,15 @@ message EndorseRequest {
     string channel_id = 2;
     // The signed proposal ready for endorsement.
     protos.SignedProposal proposed_transaction = 3;
+    // If targeting the peers of specific organizations (e.g. for private data scenarios),
+    // the list of organizations' MSPIDs should be supplied here.
+    repeated string endorsing_organizations = 4;
 }
 
 // EndorseResponse returns the result of endorsing a transaction.
 message EndorseResponse {
     // The response that is returned by the transaction function, as defined
-    // in peer/proposal_response.proto
+    // in peer/proposal_response.proto.
     protos.Response result = 1;
     // The unsigned set of transaction responses from the endorsing peers for signing by the client
     // before submitting to ordering service (via gateway).
@@ -85,6 +95,15 @@ message SubmitResponse {
     // Nothing yet
 }
 
+// SignedCommitStatusRequest contains a serialized CommitStatusRequest message, and a digital signature for the
+// serialized request message.
+message SignedCommitStatusRequest {
+    // Serialized CommitStatusRequest message.
+    bytes request = 1;
+    // Signature for request message.
+    bytes signature = 2;
+}
+
 // CommitStatusRequest contains the details required to check whether a transaction has been
 // successfully committed.
 message CommitStatusRequest {
@@ -92,12 +111,16 @@ message CommitStatusRequest {
     string transaction_id = 1;
     // Identifier of the channel this request is bound for.
     string channel_id = 2;
+    // Client requestor identity.
+    bytes identity = 3;
 }
 
 // CommitStatusResponse returns the result of committing a transaction.
 message CommitStatusResponse {
-    // The result of the transaction commit, as defined in peer/transaction.proto
+    // The result of the transaction commit, as defined in peer/transaction.proto.
     protos.TxValidationCode result = 1;
+    // Block number that contains the transaction.
+    uint64 block_number = 2;
 }
 
 // EvaluateRequest contains the details required to evaluate a transaction (query the ledger).
@@ -108,13 +131,44 @@ message EvaluateRequest {
     string channel_id = 2;
     // The signed proposal ready for evaluation.
     protos.SignedProposal proposed_transaction = 3;
+    // If targeting the peers of specific organizations (e.g. for private data scenarios),
+    // the list of organizations' MSPIDs should be supplied here.
+    repeated string target_organizations = 4;
 }
 
 // EvaluateResponse returns the result of evaluating a transaction.
 message EvaluateResponse {
     // The response that is returned by the transaction function, as defined
-    // in peer/proposal_response.proto
+    // in peer/proposal_response.proto.
     protos.Response result = 1;
+}
+
+// SignedChaincodeEventsRequest contains a serialized ChaincodeEventsRequest message, and a digital signature for the
+// serialized request message.
+message SignedChaincodeEventsRequest {
+    // Serialized ChaincodeEventsRequest message.
+    bytes request = 1;
+    // Signature for request message.
+    bytes signature = 2;
+}
+
+// ChaincodeEventsRequest contains details of the chaincode events that the caller wants to receive.
+message ChaincodeEventsRequest {
+    // Identifier of the channel this request is bound for.
+    string channel_id = 1;
+    // Name of the chaincode for which events are requested.
+    string chaincode_id = 2;
+    // Client requestor identity.
+    bytes identity = 3;
+}
+
+// ChaincodeEventsResponse returns chaincode events emitted from a specific block.
+message ChaincodeEventsResponse {
+    // Chaincode events emitted by the requested chaincode. The events are presented in the same order that the
+    // transactions that emitted them appear within the block.
+    repeated protos.ChaincodeEvent events = 1;
+    // Block number in which the chaincode events were emitted.
+    uint64 block_number = 2;
 }
 
 // If any of the functions in the Gateway service returns an error, then it will be in the format of
@@ -139,6 +193,8 @@ message ProposedTransaction {
     string transaction_id = 1;
     // The signed proposal.
     protos.SignedProposal proposal = 2;
+    // The list of endorsing organizations.
+    repeated string endorsing_organizations = 3;
 }
 
 // PreparedTransaction contains the details required for offline signing prior to submitting a transaction.
