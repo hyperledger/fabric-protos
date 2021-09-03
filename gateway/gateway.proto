@@ -16,6 +16,7 @@ import "peer/proposal.proto";
 import "peer/proposal_response.proto";
 import "peer/transaction.proto";
 import "common/common.proto";
+import "orderer/ab.proto";
 
 // The Gateway API for evaluating and submitting transactions via the gateway.
 // Transaction evaluation (query) requires the invocation of the Evaluate service
@@ -160,6 +161,8 @@ message ChaincodeEventsRequest {
     string chaincode_id = 2;
     // Client requestor identity.
     bytes identity = 3;
+    // Position within the ledger at which to start reading events.
+    orderer.SeekPosition start_position = 4;
 }
 
 // ChaincodeEventsResponse returns chaincode events emitted from a specific block.
