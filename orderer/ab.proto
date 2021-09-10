@@ -23,7 +23,7 @@ message SeekNewest { }
 message SeekOldest { }
 
 message SeekSpecified {
-    uint64 number = 1;
+    uint64 number = 1 [jstype = JS_STRING];
 }
 
 // SeekNextCommit refers to the next block that will be committed
