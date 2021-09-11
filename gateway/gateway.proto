@@ -121,7 +121,7 @@ message CommitStatusResponse {
     // The result of the transaction commit, as defined in peer/transaction.proto.
     protos.TxValidationCode result = 1;
     // Block number that contains the transaction.
-    uint64 block_number = 2 [jstype = JS_STRING];
+    uint64 block_number = 2;
 }
 
 // EvaluateRequest contains the details required to evaluate a transaction (query the ledger).
@@ -171,7 +171,7 @@ message ChaincodeEventsResponse {
     // transactions that emitted them appear within the block.
     repeated protos.ChaincodeEvent events = 1;
     // Block number in which the chaincode events were emitted.
-    uint64 block_number = 2 [jstype = JS_STRING];
+    uint64 block_number = 2;
 }
 
 // If any of the functions in the Gateway service returns an error, then it will be in the format of
