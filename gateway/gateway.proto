@@ -177,15 +177,15 @@ message ChaincodeEventsResponse {
 // If any of the functions in the Gateway service returns an error, then it will be in the format of
 // a google.rpc.Status message. The 'details' field of this message will be populated with extra
 // information if the error is a result of one or more failed requests to remote peers or orderer nodes.
-// EndpointError contains details of errors that are received by any of the endorsing peers
+// ErrorDetail contains details of errors that are received by any of the endorsing peers
 // as a result of processing the Evaluate or Endorse services, or from the ordering node(s) as a result of
 // processing the Submit service.
-message EndpointError {
+message ErrorDetail {
     // The address of the endorsing peer or ordering node that returned an error.
     string address = 1;
-    // The MSP Identifier of this endpoint.
+    // The MSP Identifier of this node.
     string msp_id = 2;
-    // The error message returned by this endpoint.
+    // The error message returned by this node.
     string message = 3;
 }
 
