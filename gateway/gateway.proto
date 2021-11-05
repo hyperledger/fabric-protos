@@ -69,6 +69,10 @@ message EndorseRequest {
     // If targeting the peers of specific organizations (e.g. for private data scenarios),
     // the list of organizations' MSPIDs should be supplied here.
     repeated string endorsing_organizations = 4;
+    // Name of the chaincode to be invoked.
+    string chaincode_name = 5;
+    // Whether the proposal includes transient data.
+    bool has_transient_data = 6;
 }
 
 // EndorseResponse returns the result of endorsing a transaction.
@@ -135,6 +139,10 @@ message EvaluateRequest {
     // If targeting the peers of specific organizations (e.g. for private data scenarios),
     // the list of organizations' MSPIDs should be supplied here.
     repeated string target_organizations = 4;
+    // Name of the chaincode to be invoked.
+    string chaincode_name = 5;
+    // Whether the proposal includes transient data.
+    bool has_transient_data = 6;
 }
 
 // EvaluateResponse returns the result of evaluating a transaction.
