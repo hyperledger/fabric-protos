@@ -73,12 +73,9 @@ message EndorseRequest {
 
 // EndorseResponse returns the result of endorsing a transaction.
 message EndorseResponse {
-    // The response that is returned by the transaction function, as defined
-    // in peer/proposal_response.proto.
-    protos.Response result = 1;
     // The unsigned set of transaction responses from the endorsing peers for signing by the client
     // before submitting to ordering service (via gateway).
-    common.Envelope prepared_transaction = 2;
+    common.Envelope prepared_transaction = 1;
 }
 
 // SubmitRequest contains the details required to submit a transaction (update the ledger).
@@ -206,7 +203,4 @@ message PreparedTransaction {
     string transaction_id = 1;
     // The transaction envelope.
     common.Envelope envelope = 2;
-    // The response that is returned by the transaction function during endorsement, as defined
-    // in peer/proposal_response.proto
-    protos.Response result = 3;
 }
