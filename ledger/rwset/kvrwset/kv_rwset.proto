@@ -58,6 +58,7 @@ message KVWriteHash {
     bytes key_hash = 1;
     bool is_delete = 2;
     bytes value_hash = 3;
+    bool is_purge = 4;
 }
 
 // KVMetadataWriteHash captures all the upserts to the metadata associated with a key hash
