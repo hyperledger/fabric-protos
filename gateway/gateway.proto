@@ -160,6 +160,10 @@ message ChaincodeEventsRequest {
     bytes identity = 3;
     // Position within the ledger at which to start reading events.
     orderer.SeekPosition start_position = 4;
+    // Only returns events after this transaction ID. Transactions up to and including this one should be ignored. This
+    // is used to allow resume of event listening from a certain position within a start block specified by
+    // start_position.
+    string after_transaction_id = 5;
 }
 
 // ChaincodeEventsResponse returns chaincode events emitted from a specific block.
