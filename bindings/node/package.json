@@ -1,0 +1,35 @@
+{
+    "name": "@hyperledger/fabric-protos",
+    "version": "1.0.0",
+    "description": "Node bindings for Hyperledger Fabric protocol buffers",
+    "main": "index.js",
+    "types": "index.d.ts",
+    "scripts": {
+        "build": "npm-run-all clean protoc index compile",
+        "clean": "rm -rf *.ts *.js *.map common discovery gateway google gossip ledger msp orderer peer transientstore",
+        "compile": "tsc",
+        "index": "./build_index.sh",
+        "protoc": "grpc_tools_node_protoc --proto_path=../.. --js_out=import_style=commonjs,binary:. --ts_out=service=grpc-node,mode=grpc-js:. --grpc_out=grpc_js:. $(find ../.. \\( -type d -name bindings -prune \\) -o -name '*.proto' -print)",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hyperledger/fabric-protos.git"
+    },
+    "author": "",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/hyperledger/fabric-protos/issues"
+    },
+    "homepage": "https://github.com/hyperledger/fabric-protos#readme",
+    "devDependencies": {
+        "grpc-tools": "^1.11.2",
+        "npm-run-all": "^4.1.5",
+        "ts-protoc-gen": "^0.15.0",
+        "typescript": "^4.6.2"
+    },
+    "dependencies": {
+        "@grpc/grpc-js": "^1.5.9",
+        "google-protobuf": "^3.19.4"
+    }
+}
