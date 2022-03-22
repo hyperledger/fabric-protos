@@ -1,0 +1,17 @@
+version: v1
+plugins:
+  - name: js
+    out: bindings/node/src
+    opt:
+      - import_style=commonjs
+      - binary
+  - name: js-grpc
+    path: grpc_tools_node_protoc_plugin
+    out: bindings/node/src
+    opt:
+      - grpc_js
+  - name: ts
+    out: bindings/node/src
+    opt:
+      - service=grpc-node
+      - mode=grpc-js
