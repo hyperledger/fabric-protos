@@ -8,3 +8,6 @@
 /build
 .idea
 .vscode
+
+/google
+/bindings/node/src
