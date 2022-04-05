@@ -10,4 +10,5 @@
 .vscode
 
 /google
+/bindings/java/src
 /bindings/node/src
