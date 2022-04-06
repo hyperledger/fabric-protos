@@ -30,6 +30,7 @@ BUF_VERSION := 1.1.1
 BUF_INSTALL_FROM_SOURCE := false
 
 PROTOC_VERSION := 3.19.4
+PROTOC_GEN_GRPC_JAVA_VERSION := 1.45.1
 GRPC_TOOLS_VERSION := 1.11.2
 TS_PROTOC_GEN_VERSION := 0.15.0
 
@@ -103,6 +104,21 @@ $(PROTOC):
 	@mkdir -p $(dir $(PROTOC))
 	@touch $(PROTOC)
 
+# PROTOC_GEN_GRPC_JAVA points to the marker file for the installed version.
+#
+# If PROTOC_GEN_GRPC_JAVA_VERSION is changed, the binary will be re-downloaded.
+PROTOC_GEN_GRPC_JAVA := $(CACHE_VERSIONS)/protoc-gen-grpc-java/$(PROTOC_GEN_GRPC_JAVA_VERSION)
+$(PROTOC_GEN_GRPC_JAVA):
+	@rm -f $(CACHE_BIN)/protoc-gen-grpc-java
+	@mkdir -p $(CACHE_BIN)
+	curl -sSL \
+		"https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/$(PROTOC_GEN_GRPC_JAVA_VERSION)/protoc-gen-grpc-java-$(PROTOC_GEN_GRPC_JAVA_VERSION)-$(PLATFORM)-$(UNAME_ARCH).exe" \
+		-o "$(CACHE_BIN)/protoc-gen-grpc-java"
+	chmod +x "$(CACHE_BIN)/protoc-gen-grpc-java"
+	@rm -rf $(dir $(PROTOC_GEN_GRPC_JAVA))
+	@mkdir -p $(dir $(PROTOC_GEN_GRPC_JAVA))
+	@touch $(PROTOC_GEN_GRPC_JAVA)
+
 # GRPC_TOOLS points to the marker file for the installed version.
 #
 # If GRPC_TOOLS_VERSION is changed, the binary will be re-downloaded.
@@ -172,8 +188,12 @@ $(GRPC_STATUS_PROTO):
 		-o "$(GRPC_STATUS_PROTO)"
 
 .PHONY: genprotos
-genprotos: $(BUF) $(PROTOC) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
+genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
 	buf generate --template buf.gen.yaml
+
+.PHONY: genjava
+genjava: genprotos
+	cd bindings/java && mvn install -DskipTests
 
 .PHONY: gennode
 gennode: genprotos
