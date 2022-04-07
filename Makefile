@@ -30,6 +30,7 @@ BUF_VERSION := 1.1.1
 BUF_INSTALL_FROM_SOURCE := false
 
 PROTOC_VERSION := 3.19.4
+PROTOC_GEN_DOC_VERSION := 1.5.1
 PROTOC_GEN_GRPC_JAVA_VERSION := 1.45.1
 GRPC_TOOLS_VERSION := 1.11.2
 TS_PROTOC_GEN_VERSION := 0.15.0
@@ -103,6 +104,20 @@ $(PROTOC):
 	@rm -rf $(dir $(PROTOC))
 	@mkdir -p $(dir $(PROTOC))
 	@touch $(PROTOC)
+
+# PROTOC_GEN_DOC points to the marker file for the installed version.
+#
+# If PROTOC_GEN_DOC_VERSION is changed, the binary will be re-downloaded.
+PROTOC_GEN_DOC := $(CACHE_VERSIONS)/protoc-gen-doc/$(PROTOC_GEN_DOC_VERSION)
+$(PROTOC_GEN_DOC):
+	@rm -f $(CACHE_BIN)/protoc-gen-doc
+	@mkdir -p $(CACHE_BIN)
+	$(eval PROTOC_GEN_DOC_TMP := $(shell mktemp -d))
+	cd $(PROTOC_GEN_DOC_TMP); go get github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v$(PROTOC_GEN_DOC_VERSION)
+	@rm -rf $(PROTOC_GEN_DOC_TMP)
+	@rm -rf $(dir $(PROTOC_GEN_DOC))
+	@mkdir -p $(dir $(PROTOC_GEN_DOC))
+	@touch $(PROTOC_GEN_DOC)
 
 # PROTOC_GEN_GRPC_JAVA points to the marker file for the installed version.
 #
@@ -188,7 +203,7 @@ $(GRPC_STATUS_PROTO):
 		-o "$(GRPC_STATUS_PROTO)"
 
 .PHONY: genprotos
-genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
+genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
 	buf generate --template buf.gen.yaml
 
 .PHONY: javabindings

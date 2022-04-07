@@ -38,6 +38,12 @@ managed:
       peer/snapshot.proto: org.hyperledger.fabric.protos.peer
       peer/transaction.proto: org.hyperledger.fabric.protos.peer
 plugins:
+  - name: doc
+    out: docs
+    opt:
+      - markdown
+      - protos.md
+    strategy: all
   - name: java
     out: bindings/java/src/main/java
   - name: grpc-java

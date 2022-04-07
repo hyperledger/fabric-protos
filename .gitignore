@@ -9,6 +9,7 @@
 .idea
 .vscode
 
+/docs/protos.md
 /google
 /bindings/java/src
 /bindings/node/src
