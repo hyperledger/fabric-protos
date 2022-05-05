@@ -146,7 +146,7 @@ $(TS_PROTOC_GEN):
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: lint gennode
+all: lint gennode genjava
 
 # deps allows us to install deps without running any checks.
 
@@ -154,7 +154,7 @@ all: lint gennode
 deps: $(BUF) $(PROTOC) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
 
 .PHONY: lint
-lint: local
+lint: https
 
 # local is what we run when testing locally.
 # This does breaking change detection against our local git repository.
@@ -198,7 +198,7 @@ genjava: genprotos
 .PHONY: gennode
 gennode: genprotos
 	./scripts/generate_node_indexes.sh bindings/node/src
-	cd bindings/node && npm install && npm run compile
+	cd bindings/node && npm ci && npm run compile
 
 # clean deletes any files not checked in and the cache for all platforms.
 
