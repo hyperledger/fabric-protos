@@ -1,21 +1,21 @@
-name: Makefile CI
+name: Build checks
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_call:
+    outputs:
+      binding_version:
+        description: "Current binding version"
+        value: ${{ jobs.check_version.outputs.binding_version }}
 
 env:
   BINDING_VERSION: 0.1.0
 
 jobs:
-  check-version:
+  check_version:
     name: Check versions
     runs-on: ubuntu-latest
     outputs:
-      binding-version: ${{ env.BINDING_VERSION }}
+      binding_version: ${{ env.BINDING_VERSION }}
 
     steps:
     - uses: actions/checkout@v3
@@ -41,8 +41,8 @@ jobs:
         echo "pom.xml version: ${POM_VERSION}"
         [ "${POM_VERSION%-SNAPSHOT}" = "${BINDING_VERSION}" ] || exit 1
 
-  build:
-    name: Build
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -59,28 +59,5 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
           ${{ runner.os }}-${{ env.cache-name }}-
 
-    - uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '8'
-        cache: 'maven'
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 14
-        cache: 'npm'
-        cache-dependency-path: bindings/node/package-lock.json
-
     - name: Run build
-      run: make
-
-  publish-node-binding:
-    if: github.event_name != 'pull_request'
-    name: Publish Node.js binding
-    needs: [ build, check-version ]
-    uses: ./.github/workflows/publish-node.yml
-    with:
-      registry: https://registry.npmjs.org/
-      version: ${{needs.check-version.outputs.binding-version}}
-    secrets:
-      token: ${{ secrets.NPM_TOKEN }}
+      run: make lint

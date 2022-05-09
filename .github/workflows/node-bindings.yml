@@ -1,0 +1,59 @@
+name: Node.js Bindings
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Node.js bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+        cache: 'npm'
+        cache-dependency-path: bindings/node/package-lock.json
+        registry-url: https://registry.npmjs.org/
+
+    - name: Run make
+      run: make gennode
+
+    - run: npm version ${BINDING_VERSION}-dev.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}
+      name: npm version
+      if: github.event_name != 'release'
+      working-directory: bindings/node
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+
+    - run: |
+        npm publish --access public --tag latest
+      name: npm publish
+      working-directory: bindings/node
+      env:
+        NPM_CONFIG_DRY_RUN: ${{ ( github.event_name == 'push' || github.event_name == 'release' ) && 'false' || 'true'}}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
