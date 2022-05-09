@@ -146,7 +146,7 @@ $(TS_PROTOC_GEN):
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: lint gennode genjava
+all: lint javabindings nodebindings
 
 # deps allows us to install deps without running any checks.
 
@@ -191,12 +191,12 @@ $(GRPC_STATUS_PROTO):
 genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
 	buf generate --template buf.gen.yaml
 
-.PHONY: genjava
-genjava: genprotos
+.PHONY: javabindings
+javabindings: genprotos
 	cd bindings/java && mvn install -DskipTests
 
-.PHONY: gennode
-gennode: genprotos
+.PHONY: nodebindings
+nodebindings: genprotos
 	./scripts/generate_node_indexes.sh bindings/node/src
 	cd bindings/node && npm ci && npm run compile
 

@@ -31,11 +31,34 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
           ${{ runner.os }}-${{ env.cache-name }}-
 
-    - uses: actions/setup-java@v3
+    - name: Set up Java for publishing to GitHub Packages
+      uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '8'
         cache: 'maven'
 
     - name: Run make
-      run: make genjava
+      run: make javabindings
+
+    - name: Set prerelease version
+      run: mvn --batch-mode versions:set -DnewVersion=${BINDING_VERSION}-dev-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
+      if: github.event_name != 'release'
+      working-directory: bindings/java
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+
+    - name: Set release version
+      run: mvn --batch-mode versions:set -DnewVersion=${BINDING_VERSION}
+      if: github.event_name == 'release'
+      working-directory: bindings/java
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+
+    - name: Publish to GitHub Packages
+      run: mvn -P github --batch-mode deploy
+      if: github.event_name != 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
