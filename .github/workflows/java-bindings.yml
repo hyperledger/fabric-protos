@@ -60,5 +60,6 @@ jobs:
     - name: Publish to GitHub Packages
       run: mvn -P github --batch-mode deploy
       if: github.event_name != 'pull_request'
+      working-directory: bindings/java
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
