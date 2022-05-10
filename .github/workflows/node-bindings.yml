@@ -39,7 +39,7 @@ jobs:
         registry-url: https://registry.npmjs.org/
 
     - name: Run make
-      run: make gennode
+      run: make nodebindings
 
     - run: npm version ${BINDING_VERSION}-dev.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}
       name: npm version

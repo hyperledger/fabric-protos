@@ -96,6 +96,19 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>github</id>
+      <distributionManagement>
+        <repository>
+          <id>github</id>
+          <name>GitHub hyperledger Apache Maven Packages</name>
+          <url>https://maven.pkg.github.com/hyperledger/fabric-protos</url>
+        </repository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
       <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
