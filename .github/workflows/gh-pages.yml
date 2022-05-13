@@ -1,0 +1,59 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build documentation
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Run make
+      run: make genprotos
+
+    - name: Get git remote
+      id: get-remote
+      run: echo ::set-output name=REMOTE_URL::$(git remote get-url --push origin)
+
+    - name: Create GitHub pages commit
+      run: |
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global init.defaultBranch gh-pages
+        git init
+        git add -A
+        git commit -m "Deploy to GitHub Pages"
+        git status
+        git log -n 1 --name-status
+      working-directory: docs
+
+    - name: Push GitHub pages commit
+      run: git push --force $(sed -e "s^://^://$GITHUB_TOKEN@^" <<<$REMOTE_URL) gh-pages:gh-pages
+      if: github.event_name != 'pull_request'
+      working-directory: docs
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REMOTE_URL: ${{ steps.get-remote.outputs.REMOTE_URL }}
