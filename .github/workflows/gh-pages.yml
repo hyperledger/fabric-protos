@@ -18,7 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout (build)
+      uses: actions/checkout@v3
+      with:
+        path: build
+
+    - name: Checkout (publish)
+      uses: actions/checkout@v3
+      with:
+        path: publish
 
     - name: Cache build dependencies
       uses: actions/cache@v3
@@ -33,27 +41,22 @@ jobs:
 
     - name: Run make
       run: make genprotos
-
-    - name: Get git remote
-      id: get-remote
-      run: echo ::set-output name=REMOTE_URL::$(git remote get-url --push origin)
+      working-directory: build
 
     - name: Create GitHub pages commit
       run: |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        git config --global init.defaultBranch gh-pages
-        git init
+        git checkout --orphan publish-pages
+        git rm -rf .
+        cp -a ../build/docs/. .
         git add -A
         git commit -m "Deploy to GitHub Pages"
         git status
-        git log -n 1 --name-status
-      working-directory: docs
+        git log --name-status
+      working-directory: publish
 
     - name: Push GitHub pages commit
-      run: git push --force $(sed -e "s^://^://$GITHUB_TOKEN@^" <<<$REMOTE_URL) gh-pages:gh-pages
+      run: git push --force publish-pages:gh-pages
       if: github.event_name != 'pull_request'
-      working-directory: docs
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REMOTE_URL: ${{ steps.get-remote.outputs.REMOTE_URL }}
+      working-directory: publish
