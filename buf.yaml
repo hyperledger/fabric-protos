@@ -5,8 +5,12 @@ build:
 lint:
   use:
     - DEFAULT
+  except:
+    - PACKAGE_VERSION_SUFFIX
   ignore:
     - google
+  # IMPORTANT: the following rules are ignored due to *existing* proto files.
+  # Please DO NOT add new files to this list unless strictly necessary.
   ignore_only:
     DIRECTORY_SAME_PACKAGE:
       - msp/identities.proto
@@ -92,48 +96,6 @@ lint:
       - common/ledger.proto
       - common/policies.proto
       - msp/msp_principal.proto
-    PACKAGE_VERSION_SUFFIX:
-      - common/collection.proto
-      - common/common.proto
-      - common/configtx.proto
-      - common/configuration.proto
-      - common/ledger.proto
-      - common/policies.proto
-      - discovery/protocol.proto
-      - gateway/gateway.proto
-      - gossip/message.proto
-      - ledger/queryresult/kv_query_result.proto
-      - ledger/rwset/kvrwset/kv_rwset.proto
-      - ledger/rwset/rwset.proto
-      - msp/identities.proto
-      - msp/msp_config.proto
-      - msp/msp_principal.proto
-      - orderer/ab.proto
-      - orderer/cluster.proto
-      - orderer/configuration.proto
-      - orderer/etcdraft/configuration.proto
-      - orderer/etcdraft/metadata.proto
-      - orderer/kafka.proto
-      - orderer/blockattestation.proto
-      - peer/chaincode.proto
-      - peer/chaincode_event.proto
-      - peer/chaincode_shim.proto
-      - peer/collection.proto
-      - peer/configuration.proto
-      - peer/events.proto
-      - peer/lifecycle/chaincode_definition.proto
-      - peer/lifecycle/db.proto
-      - peer/lifecycle/lifecycle.proto
-      - peer/peer.proto
-      - peer/policy.proto
-      - peer/proposal.proto
-      - peer/proposal_response.proto
-      - peer/query.proto
-      - peer/resources.proto
-      - peer/signed_cc_dep_spec.proto
-      - peer/snapshot.proto
-      - peer/transaction.proto
-      - transientstore/transientstore.proto
     RPC_REQUEST_RESPONSE_UNIQUE:
       - gossip/message.proto
       - orderer/ab.proto
