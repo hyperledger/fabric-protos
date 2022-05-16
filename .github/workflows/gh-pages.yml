@@ -57,6 +57,6 @@ jobs:
       working-directory: publish
 
     - name: Push GitHub pages commit
-      run: git push --force publish-pages:gh-pages
+      run: git push --force origin publish-pages:gh-pages
       if: github.event_name != 'pull_request'
       working-directory: publish
