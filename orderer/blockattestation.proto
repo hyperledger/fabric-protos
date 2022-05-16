@@ -16,14 +16,18 @@ message BlockAttestation {
        common.BlockMetadata metadata = 2;
 }
 
-message BlockAttestationResponse {
-    oneof Type {
+message BlockAttestationsRequest {
+    common.Envelope envelope = 1;
+}
+
+message BlockAttestationsResponse {
+    oneof type {
         common.Status status = 1;
         BlockAttestation block_attestation = 2;
     }
 }
 
-service BlockAttestations {
+service BlockAttestationsService {
     // BlockAttestations receives an Envelope of type DELIVER_SEEK_INFO , then sends back a stream of BlockAttestations.
-    rpc BlockAttestations(common.Envelope) returns (stream BlockAttestationResponse);
+    rpc BlockAttestations(BlockAttestationsRequest) returns (stream BlockAttestationsResponse);
 }
