@@ -31,6 +31,8 @@ BUF_INSTALL_FROM_SOURCE := false
 
 PROTOC_VERSION := 3.19.4
 PROTOC_GEN_DOC_VERSION := 1.5.1
+PROTOC_GEN_GO_VERSION := v1.28.0
+PROTOC_GEN_GO_GRPC_VERSION := v1.2.0
 PROTOC_GEN_GRPC_JAVA_VERSION := 1.45.1
 GRPC_TOOLS_VERSION := 1.11.2
 TS_PROTOC_GEN_VERSION := 0.15.0
@@ -119,6 +121,34 @@ $(PROTOC_GEN_DOC):
 	@mkdir -p $(dir $(PROTOC_GEN_DOC))
 	@touch $(PROTOC_GEN_DOC)
 
+# PROTOC_GEN_GO points to the marker file for the installed version.
+#
+# If PROTOC_GEN_GO_VERSION is changed, the binary will be re-downloaded.
+PROTOC_GEN_GO := $(CACHE_VERSIONS)/protoc-gen-go/$(PROTOC_GEN_GO_VERSION)
+$(PROTOC_GEN_GO):
+	@rm -f $(CACHE_BIN)/protoc-gen-go
+	@mkdir -p $(CACHE_BIN)
+	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
+	cd $(PROTOC_GEN_GO_TMP); go get google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	@rm -rf $(PROTOC_GEN_GO_TMP)
+	@rm -rf $(dir $(PROTOC_GEN_GO))
+	@mkdir -p $(dir $(PROTOC_GEN_GO))
+	@touch $(PROTOC_GEN_GO)
+
+# PROTOC_GEN_GO_GRPC points to the marker file for the installed version.
+#
+# If PROTOC_GEN_GO_GRPC_VERSION is changed, the binary will be re-downloaded.
+PROTOC_GEN_GO_GRPC := $(CACHE_VERSIONS)/protoc-gen-go-grpc/$(PROTOC_GEN_GO_GRPC_VERSION)
+$(PROTOC_GEN_GO_GRPC):
+	@rm -f $(CACHE_BIN)/protoc-gen-go-grpc
+	@mkdir -p $(CACHE_BIN)
+	$(eval PROTOC_GEN_GO_GRPC_TMP := $(shell mktemp -d))
+	cd $(PROTOC_GEN_GO_GRPC_TMP); go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+	@rm -rf $(PROTOC_GEN_GO_GRPC_TMP)
+	@rm -rf $(dir $(PROTOC_GEN_GO_GRPC))
+	@mkdir -p $(dir $(PROTOC_GEN_GO_GRPC))
+	@touch $(PROTOC_GEN_GO_GRPC)
+
 # PROTOC_GEN_GRPC_JAVA points to the marker file for the installed version.
 #
 # If PROTOC_GEN_GRPC_JAVA_VERSION is changed, the binary will be re-downloaded.
@@ -166,7 +196,7 @@ all: lint javabindings nodebindings
 # deps allows us to install deps without running any checks.
 
 .PHONY: deps
-deps: $(BUF) $(PROTOC) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
+deps: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
 
 .PHONY: lint
 lint: https
@@ -203,7 +233,7 @@ $(GRPC_STATUS_PROTO):
 		-o "$(GRPC_STATUS_PROTO)"
 
 .PHONY: genprotos
-genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
+genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
 	buf generate --template buf.gen.yaml
 
 .PHONY: javabindings
