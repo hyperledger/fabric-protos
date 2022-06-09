@@ -11,5 +11,6 @@
 
 /docs/protos.md
 /google
+/bindings/go-apiv2/**/*.pb.go
 /bindings/java/src
 /bindings/node/src
