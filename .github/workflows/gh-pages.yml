@@ -45,8 +45,8 @@ jobs:
 
     - name: Create GitHub pages commit
       run: |
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
+        git config --global user.email "hyperledger-bot@hyperledger.org"
+        git config --global user.name "hyperledger-bot"
         git checkout --orphan publish-pages
         git rm -rf .
         cp -a ../build/docs/. .
