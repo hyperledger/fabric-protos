@@ -1,0 +1,69 @@
+name: Go Bindings
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Go bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout (build)
+      uses: actions/checkout@v3
+      with:
+        path: build
+
+    - name: Checkout (publish apiv2)
+      uses: actions/checkout@v3
+      with:
+        repository: hyperledger/fabric-protos-go-apiv2
+        path: publish-apiv2
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Run make
+      run: make genprotos
+      working-directory: build
+
+    - name: Get commit message
+      run: echo "::set-output name=COMMIT_MESSAGE::$(git log --format=%B -n 1 $GITHUB_SHA)"
+      id: get-commit-message
+      working-directory: build
+
+    - name: Create apiv2 publish commit
+      run: |
+        git config --global user.email "hyperledger-bot@hyperledger.org"
+        git config --global user.name "hyperledger-bot"
+        cp -a ../build/bindings/go-apiv2/. .
+        git add -A
+        git diff --cached --quiet || git commit -m "$COMMIT_MESSAGE" --no-edit
+        git status
+        git log --name-status
+      working-directory: publish-apiv2
+      env:
+        COMMIT_MESSAGE: ${{ steps.get-commit-message.outputs.COMMIT_MESSAGE }}
+
+    - name: Push GitHub apiv2 publish commit
+      run: git push origin
+      if: github.ref == 'refs/heads/main'
+      working-directory: publish-apiv2
