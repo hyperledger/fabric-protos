@@ -64,6 +64,13 @@ jobs:
         COMMIT_MESSAGE: ${{ steps.get-commit-message.outputs.COMMIT_MESSAGE }}
 
     - name: Push GitHub apiv2 publish commit
-      run: git push origin
+      run: |
+        ./.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
+        touch "${HOME}/.ssh/known_hosts"
+        ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
+        git remote set-url origin git@github.com-fabric-protos-go-apiv2:hyperledger/fabric-protos-go-apiv2.git
+        git push origin
       if: github.ref == 'refs/heads/main'
       working-directory: publish-apiv2
+      env:
+        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
