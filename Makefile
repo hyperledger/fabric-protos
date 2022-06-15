@@ -76,7 +76,7 @@ $(BUF):
 	@mkdir -p $(CACHE_BIN)
 ifeq ($(BUF_INSTALL_FROM_SOURCE),true)
 	$(eval BUF_TMP := $(shell mktemp -d))
-	cd $(BUF_TMP); go get github.com/bufbuild/buf/cmd/buf@v$(BUF_VERSION)
+	cd $(BUF_TMP); go install github.com/bufbuild/buf/cmd/buf@v$(BUF_VERSION)
 	@rm -rf $(BUF_TMP)
 else
 	curl -sSL \
@@ -115,7 +115,7 @@ $(PROTOC_GEN_DOC):
 	@rm -f $(CACHE_BIN)/protoc-gen-doc
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_DOC_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_DOC_TMP); go get github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v$(PROTOC_GEN_DOC_VERSION)
+	cd $(PROTOC_GEN_DOC_TMP); go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v$(PROTOC_GEN_DOC_VERSION)
 	@rm -rf $(PROTOC_GEN_DOC_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_DOC))
 	@mkdir -p $(dir $(PROTOC_GEN_DOC))
@@ -129,7 +129,7 @@ $(PROTOC_GEN_GO):
 	@rm -f $(CACHE_BIN)/protoc-gen-go
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_TMP); go get google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	cd $(PROTOC_GEN_GO_TMP); go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_GO))
 	@mkdir -p $(dir $(PROTOC_GEN_GO))
@@ -143,7 +143,7 @@ $(PROTOC_GEN_GO_GRPC):
 	@rm -f $(CACHE_BIN)/protoc-gen-go-grpc
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_GO_GRPC_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_GRPC_TMP); go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+	cd $(PROTOC_GEN_GO_GRPC_TMP); go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_GRPC_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_GO_GRPC))
 	@mkdir -p $(dir $(PROTOC_GEN_GO_GRPC))

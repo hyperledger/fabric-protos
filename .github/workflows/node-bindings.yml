@@ -39,6 +39,11 @@ jobs:
         cache-dependency-path: bindings/node/package-lock.json
         registry-url: https://registry.npmjs.org/
 
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
     - name: Run make
       run: make nodebindings
 
