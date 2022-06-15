@@ -1,0 +1,29 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric-protos-go/orderer";
+option java_package = "org.hyperledger.fabric.protos.orderer";
+
+package orderer;
+
+import "common/common.proto";
+
+message BlockAttestation {
+       common.BlockHeader header = 1;
+       common.BlockMetadata metadata = 2;
+}
+
+message BlockAttestationResponse {
+    oneof Type {
+        common.Status status = 1;
+        BlockAttestation block_attestation = 2;
+    }
+}
+
+service BlockAttestations {
+    // BlockAttestations receives an Envelope of type DELIVER_SEEK_INFO , then sends back a stream of BlockAttestations.
+    rpc BlockAttestations(common.Envelope) returns (stream BlockAttestationResponse);
+}

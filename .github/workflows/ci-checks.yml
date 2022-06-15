@@ -1,0 +1,91 @@
+name: Build checks
+
+on:
+  workflow_call:
+    outputs:
+      publish_release:
+        description: "'true' if this is a release build"
+        value: ${{ jobs.check_release.outputs.publish_release }}
+      binding_version:
+        description: "Current binding version"
+        value: ${{ jobs.check_version.outputs.binding_version }}
+
+env:
+  BINDING_VERSION: 0.1.1
+
+jobs:
+  check_release:
+    name: Check release
+    runs-on: ubuntu-latest
+    outputs:
+      publish_release: ${{ steps.check_release_tag.outputs.publish_release }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check release tag
+      id: check_release_tag
+      run: |
+        git fetch --tags origin
+        TAGS=$(git tag --points-at HEAD | { grep -c "^v${BINDING_VERSION}$" || :; })
+        if [ $TAGS -eq 1 ]; then
+          echo "::set-output name=publish_release::true"
+        else
+          echo "::set-output name=publish_release::false"
+        fi
+
+  check_version:
+    name: Check versions
+    runs-on: ubuntu-latest
+    outputs:
+      binding_version: ${{ env.BINDING_VERSION }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+
+    - name: Check package.json version
+      working-directory: bindings/node
+      run: |
+        NODE_MODULE_VERSION=$(jq --raw-output .version package.json)
+        echo "Expected version: ${BINDING_VERSION}"
+        echo "package.json version: ${NODE_MODULE_VERSION}"
+        [ "${NODE_MODULE_VERSION}" = "${BINDING_VERSION}" ] || exit 1
+
+    - name: Check pom.xml version
+      working-directory: bindings/java
+      run: |
+        POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "Expected version: ${BINDING_VERSION}"
+        echo "pom.xml version: ${POM_VERSION}"
+        [ "${POM_VERSION%-SNAPSHOT}" = "${BINDING_VERSION}" ] || exit 1
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Run build
+      run: make lint

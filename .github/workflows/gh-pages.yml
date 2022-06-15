@@ -1,0 +1,67 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build documentation
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout (build)
+      uses: actions/checkout@v3
+      with:
+        path: build
+
+    - name: Checkout (publish)
+      uses: actions/checkout@v3
+      with:
+        path: publish
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Run make
+      run: make genprotos
+      working-directory: build
+
+    - name: Create GitHub pages commit
+      run: |
+        git config --global user.email "hyperledger-bot@hyperledger.org"
+        git config --global user.name "hyperledger-bot"
+        git checkout --orphan publish-pages
+        git rm -rf .
+        cp -a ../build/docs/. .
+        git add -A
+        git commit -m "Deploy to GitHub Pages"
+        git status
+        git log --name-status
+      working-directory: publish
+
+    - name: Push GitHub pages commit
+      run: git push --force origin publish-pages:gh-pages
+      if: github.event_name != 'pull_request'
+      working-directory: publish
