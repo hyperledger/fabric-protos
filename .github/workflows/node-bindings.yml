@@ -49,7 +49,7 @@ jobs:
 
     - run: npm version ${BINDING_VERSION}-dev.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}
       name: npm version
-      if: github.event_name != 'release'
+      if: needs.ci_checks.outputs.publish_release != 'true'
       working-directory: bindings/node
       env:
         BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
@@ -57,9 +57,10 @@ jobs:
         GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
 
     - run: |
+        [ "${NPM_CONFIG_DRY_RUN}" == "true" ] && echo "Dry run"
         npm publish --access public --tag latest
       name: npm publish
       working-directory: bindings/node
       env:
-        NPM_CONFIG_DRY_RUN: ${{ ( github.event_name == 'push' || github.event_name == 'release' ) && 'false' || 'true'}}
+        NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
