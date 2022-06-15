@@ -65,7 +65,7 @@ jobs:
 
     - name: Push GitHub apiv2 publish commit
       run: |
-        ./.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
+        ../build/.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
         touch "${HOME}/.ssh/known_hosts"
         ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
         git remote set-url origin git@github.com-fabric-protos-go-apiv2:hyperledger/fabric-protos-go-apiv2.git
