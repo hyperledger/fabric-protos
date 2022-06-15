@@ -6,7 +6,7 @@
 
   <groupId>org.hyperledger.fabric</groupId>
   <artifactId>fabric-protos</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
 
   <name>fabric-protos</name>
   <description>PROTO library for fabric-protos</description>
