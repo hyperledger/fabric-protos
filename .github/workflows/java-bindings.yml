@@ -64,6 +64,7 @@ jobs:
         BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
 
     - name: Publish to GitHub Packages
+      continue-on-error: true
       run: mvn -P github --batch-mode deploy
       if: github.event_name != 'pull_request'
       working-directory: bindings/java
