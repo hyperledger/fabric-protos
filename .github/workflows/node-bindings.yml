@@ -58,9 +58,10 @@ jobs:
 
     - run: |
         [ "${NPM_CONFIG_DRY_RUN}" == "true" ] && echo "Dry run"
-        npm publish --access public --tag latest
+        npm publish --access public --tag ${NPM_PUBLISH_TAG}
       name: npm publish
       working-directory: bindings/node
       env:
         NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
+        NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'latest' || 'unstable' }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
