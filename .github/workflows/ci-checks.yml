@@ -3,6 +3,9 @@ name: Build checks
 on:
   workflow_call:
     outputs:
+      publish_release:
+        description: "'true' if this is a release build"
+        value: ${{ jobs.check_release.outputs.publish_release }}
       binding_version:
         description: "Current binding version"
         value: ${{ jobs.check_version.outputs.binding_version }}
@@ -11,6 +14,26 @@ env:
   BINDING_VERSION: 0.1.2
 
 jobs:
+  check_release:
+    name: Check release
+    runs-on: ubuntu-latest
+    outputs:
+      publish_release: ${{ steps.check_release_tag.outputs.publish_release }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check release tag
+      id: check_release_tag
+      run: |
+        git fetch --tags origin
+        TAGS=$(git tag --points-at HEAD | { grep -c "^v${BINDING_VERSION}$" || :; })
+        if [ "${GITHUB_EVENT_NAME}" != "pull_request" ] && [ $TAGS -eq 1 ]; then
+          echo "::set-output name=publish_release::true"
+        else
+          echo "::set-output name=publish_release::false"
+        fi
+
   check_version:
     name: Check versions
     runs-on: ubuntu-latest
