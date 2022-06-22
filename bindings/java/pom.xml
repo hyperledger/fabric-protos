@@ -98,6 +98,15 @@
 
   <profiles>
     <profile>
+      <id>javadoc-no-module-directories</id>
+      <activation>
+        <jdk>[11,13)</jdk>
+      </activation>
+      <properties>
+        <additionalJavadocOpts>--no-module-directories</additionalJavadocOpts>
+      </properties>
+    </profile>
+    <profile>
       <id>github</id>
       <distributionManagement>
         <repository>
@@ -121,6 +130,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -207,6 +217,46 @@
             <configuration>
               <failOnWarning>true</failOnWarning>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.4.0</version>
+        <configuration>
+          <show>public</show>
+          <doctitle>PROTO library for fabric-protos</doctitle>
+          <nohelp>true</nohelp>
+          <failOnError>true</failOnError>
+          <links>
+            <link>https://docs.oracle.com/javase/8/docs/api/</link>
+          </links>
+          <source>${javaVersion}</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
+          <additionalJOptions>
+            <additionalJOption>${additionalJavadocOpts}</additionalJOption>
+          </additionalJOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
