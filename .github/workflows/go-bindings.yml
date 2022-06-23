@@ -79,3 +79,12 @@ jobs:
       working-directory: publish-apiv2
       env:
         FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
+
+    - name: Tag apiv2 commit
+      run: |
+        git tag v${BINDING_VERSION}
+        git push origin v${BINDING_VERSION}
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      working-directory: publish-apiv2
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
