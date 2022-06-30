@@ -31,6 +31,23 @@ message OrdererAddresses {
     repeated string addresses = 1;
 }
 
+// Consenter represents a consenting node (i.e. replica).
+message Consenter {
+    uint64 id = 1;
+    string host = 2;
+    uint32 port = 3;
+    string msp_id = 4;
+    bytes identity = 5;
+    bytes client_tls_cert = 6;
+    bytes server_tls_cert = 7;
+}
+
+// Orderers is encoded into the configuration transaction as a configuration item of type Chain
+// with a Key of "Orderers" and a Value of Orderers as marshaled protobuf bytes
+message Orderers {
+    repeated Consenter consenter_mapping = 1;
+}
+
 // Consortium represents the consortium context in which the channel was created
 message Consortium {
     string name = 1;
