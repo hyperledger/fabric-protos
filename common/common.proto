@@ -62,6 +62,13 @@ message Metadata {
 message MetadataSignature {
     bytes signature_header = 1; // An encoded SignatureHeader
     bytes signature = 2;       // The signature over the concatenation of the Metadata value bytes, signatureHeader, and block header
+    bytes identifier_header = 3; // An encoded IdentifierHeader. If the signature header is empty, this is used to identify the creator by id
+}
+
+// IdentifierHeader is used as an alternative to a SignatureHeader when the creator can be referenced by id
+message IdentifierHeader {
+    uint32 identifier = 1; // A unique identifier that represents the creator of the message
+    bytes nonce = 2; // Arbitrary number that may only be used once. Can be used to detect replay attacks.
 }
 
 message Header {
