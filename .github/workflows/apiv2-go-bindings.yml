@@ -1,0 +1,95 @@
+name: Go Bindings (apiv2)
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Go bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout (build)
+      uses: actions/checkout@v3
+      with:
+        path: build
+
+    - name: Checkout (publish apiv2)
+      uses: actions/checkout@v3
+      with:
+        repository: hyperledger/fabric-protos-go-apiv2
+        path: publish-apiv2
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Run make
+      run: make genprotos
+      working-directory: build
+
+    - name: Get commit message
+      run: echo "::set-output name=COMMIT_MESSAGE::$(git log --format=%B -n 1 $GITHUB_SHA)"
+      id: get-commit-message
+      working-directory: build
+
+    - name: Create apiv2 publish commit
+      run: |
+        git config --global user.email "hyperledger-bot@hyperledger.org"
+        git config --global user.name "hyperledger-bot"
+        cp -a ../build/bindings/go-apiv2/. .
+        git add -A
+        git diff --cached --quiet || git commit -m "$COMMIT_MESSAGE" --no-edit
+        git status
+        git log --name-status
+      working-directory: publish-apiv2
+      env:
+        COMMIT_MESSAGE: ${{ steps.get-commit-message.outputs.COMMIT_MESSAGE }}
+
+    - name: Set up apiv2 deploy key
+      run: |
+        ../build/.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
+        touch "${HOME}/.ssh/known_hosts"
+        ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
+        git remote set-url origin git@github.com-fabric-protos-go-apiv2:hyperledger/fabric-protos-go-apiv2.git
+      if: github.event_name != 'pull_request'
+      working-directory: publish-apiv2
+      env:
+        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
+
+    - name: Push GitHub apiv2 publish commit
+      run: |
+        git push origin
+      if: github.ref == 'refs/heads/main'
+      working-directory: publish-apiv2
+
+    - name: Tag apiv2 commit
+      run: |
+        git tag v${BINDING_VERSION}
+        git push origin v${BINDING_VERSION}
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      working-directory: publish-apiv2
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
