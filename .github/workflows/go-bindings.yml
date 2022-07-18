@@ -70,23 +70,20 @@ jobs:
 
     - name: Push GitHub apiv2 publish commit
       run: |
-        ../build/.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
+        ../build/.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 ${{ secrets.PUBLISH_GO_V2 }}
         touch "${HOME}/.ssh/known_hosts"
         ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
-        git remote set-url origin https://x-access-token:$FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY@github.com/hyperledger/fabric-protos-go-apiv2.git
+        git remote set-url origin https://x-access-token:${{ secrets.PUBLISH_GO_V2 }}@github.com/hyperledger/fabric-protos-go-apiv2.git
         git push origin
       if: github.ref == 'refs/heads/main'
       working-directory: publish-apiv2
-      env:
-        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.PUBLISH_GO_V2 }}
 
     - name: Tag apiv2 commit
       run: |
         git tag v${BINDING_VERSION}
-        git remote set-url origin https://x-access-token:$FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY@github.com/hyperledger/fabric-protos-go-apiv2.git
+        git remote set-url origin https://x-access-token:${{ secrets.PUBLISH_GO_V2 }}@github.com/hyperledger/fabric-protos-go-apiv2.git
         git push origin v${BINDING_VERSION}
       if: needs.ci_checks.outputs.publish_release == 'true'
       working-directory: publish-apiv2
       env:
-        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.PUBLISH_GO_V2 }}
         BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
