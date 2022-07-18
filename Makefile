@@ -31,8 +31,8 @@ BUF_INSTALL_FROM_SOURCE := false
 
 PROTOC_VERSION := 3.19.4
 PROTOC_GEN_DOC_VERSION := 1.5.1
-PROTOC_GEN_GO_VERSION := v1.28.0
-PROTOC_GEN_GO_GRPC_VERSION := v1.2.0
+PROTOC_GEN_GO_VERSION := 1.28.0
+PROTOC_GEN_GO_GRPC_VERSION := 1.2.0
 PROTOC_GEN_GRPC_JAVA_VERSION := 1.45.1
 GRPC_TOOLS_VERSION := 1.11.2
 TS_PROTOC_GEN_VERSION := 0.15.0
@@ -47,6 +47,9 @@ UNAME_OS := $(shell uname -s)
 UNAME_ARCH := $(shell uname -m)
 ifeq ($(UNAME_OS),Darwin)
 	PLATFORM := osx
+	PROTOC_ARCH := x86_64
+else
+	PROTOC_ARCH := $(UNAME_ARCH)
 endif
 ifeq ($(UNAME_OS),Linux)
 	PLATFORM := linux
@@ -97,7 +100,7 @@ $(PROTOC):
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_TMP := $(shell mktemp -d))
 	curl -sSL \
-		"https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOC_VERSION)/protoc-$(PROTOC_VERSION)-$(PLATFORM)-$(UNAME_ARCH).zip" \
+		"https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOC_VERSION)/protoc-$(PROTOC_VERSION)-$(PLATFORM)-$(PROTOC_ARCH).zip" \
 		-o "$(PROTOC_TMP)/protoc.zip"
 	unzip -o "$(PROTOC_TMP)/protoc.zip" -d "$(CACHE)" bin/protoc
 	unzip -o "$(PROTOC_TMP)/protoc.zip" -d "$(CACHE)" include/*
@@ -129,7 +132,7 @@ $(PROTOC_GEN_GO):
 	@rm -f $(CACHE_BIN)/protoc-gen-go
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_TMP); go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	cd $(PROTOC_GEN_GO_TMP); go install google.golang.org/protobuf/cmd/protoc-gen-go@v$(PROTOC_GEN_GO_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_GO))
 	@mkdir -p $(dir $(PROTOC_GEN_GO))
@@ -143,7 +146,7 @@ $(PROTOC_GEN_GO_GRPC):
 	@rm -f $(CACHE_BIN)/protoc-gen-go-grpc
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_GO_GRPC_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_GRPC_TMP); go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+	cd $(PROTOC_GEN_GO_GRPC_TMP); go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v$(PROTOC_GEN_GO_GRPC_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_GRPC_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_GO_GRPC))
 	@mkdir -p $(dir $(PROTOC_GEN_GO_GRPC))
