@@ -11,7 +11,7 @@ Pregenerated libraries are available for Go, Java, and Node.js
 ### Go
 
 ```
-go get -u github.com/hyperledger/fabric-protos-go
+go get -u github.com/hyperledger/fabric-protos-go-apiv2
 ```
 
 ### Java
@@ -34,5 +34,5 @@ npm install @hyperledger/fabric-protos
 
 - [API](protos.md)
 - [Java library](https://search.maven.org/artifact/org.hyperledger.fabric/fabric-protos)
-- [Go module](https://pkg.go.dev/github.com/hyperledger/fabric-protos-go?tab=doc)
+- [Go module](https://pkg.go.dev/github.com/hyperledger/fabric-protos-go-apiv2)
 - [Node module](https://www.npmjs.com/package/@hyperledger/fabric-protos)
