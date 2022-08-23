@@ -23,7 +23,6 @@ lint:
       - ledger/rwset/rwset.proto
       - msp/msp_principal.proto
       - orderer/ab.proto
-      - orderer/kafka.proto
       - peer/chaincode.proto
       - peer/chaincode_shim.proto
       - peer/transaction.proto
@@ -35,7 +34,6 @@ lint:
       - msp/msp_principal.proto
       - orderer/ab.proto
       - orderer/configuration.proto
-      - orderer/kafka.proto
       - peer/chaincode.proto
       - peer/chaincode_shim.proto
       - peer/transaction.proto
@@ -49,7 +47,6 @@ lint:
     ONEOF_LOWER_SNAKE_CASE:
       - common/policies.proto
       - orderer/ab.proto
-      - orderer/kafka.proto
       - orderer/blockattestation.proto
       - peer/events.proto
       - peer/lifecycle/db.proto
