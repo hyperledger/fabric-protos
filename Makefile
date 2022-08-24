@@ -215,7 +215,7 @@ local: $(BUF) $(PROTOC)
 .PHONY: https
 https: $(BUF) $(PROTOC)
 	buf lint
-#	buf breaking --against "$(HTTPS_GIT)#branch=main"
+	buf breaking --against "$(HTTPS_GIT)#branch=main"
 
 # ssh is what we run when testing in CI providers that provide ssh public key authentication.
 # This does breaking change detection against our remote HTTPS ssh repository.
