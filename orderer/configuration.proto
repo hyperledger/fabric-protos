@@ -16,7 +16,7 @@ package orderer;
 //   the encoded value is the proto message "ConsensusType"
 
 message ConsensusType {
-    // The consensus type: "solo", "kafka" or "etcdraft".
+    // The consensus type: "solo" or "etcdraft".
     string type = 1;
     // Opaque metadata, dependent on the consensus type.
     bytes metadata = 2;
@@ -53,6 +53,7 @@ message BatchTimeout {
 // Carries a list of bootstrap brokers, i.e. this is not the exclusive set of
 // brokers an ordering service
 message KafkaBrokers {
+    option deprecated = true;
     // Each broker here should be identified using the (IP|host):port notation,
     // e.g. 127.0.0.1:7050, or localhost:7050 are valid entries
     repeated string brokers = 1;
