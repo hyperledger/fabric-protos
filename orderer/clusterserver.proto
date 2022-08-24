@@ -1,0 +1,84 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric-protos-go/orderer";
+option java_package = "org.hyperledger.fabric.protos.orderer";
+
+package orderer;
+
+import "common/common.proto";
+import "google/protobuf/timestamp.proto";
+
+// Service ClusterNodeService defines communication between cluster members.
+service ClusterNodeService {
+    // Step passes an implementation-specific message to another cluster member.
+    rpc Step(stream ClusterNodeServiceStepRequest) returns (stream ClusterNodeServiceStepResponse);
+}
+
+// ClusterNodeServiceStepRequest wraps a message that is sent to a cluster member.
+message ClusterNodeServiceStepRequest {
+    oneof payload {
+        // node_conrequest is a consensus specific message between the cluster memebers.
+        NodeConsensusRequest node_conrequest = 1;
+        // node_tranrequest is a relay of a transaction.
+        NodeTransactionOrderRequest node_tranrequest = 2;
+        // Auth authentiates the member that initiated the stream
+        NodeAuthRequest node_authrequest = 3;
+    }
+}
+
+// ClusterNodeServiceStepResponse is a message received from a cluster member.
+message ClusterNodeServiceStepResponse {
+    oneof payload {
+        TransactionOrderResponse tranorder_res = 1;
+    }
+}
+
+// NodeConsensusRequest is a consensus specific message sent to a cluster member.
+message NodeConsensusRequest {
+    bytes payload = 1;
+    bytes metadata = 2;
+}
+
+// NodeTransactionOrderRequest wraps a transaction to be sent for ordering.
+message NodeTransactionOrderRequest {
+    // last_validation_seq denotes the last configuration sequence at which the
+    // sender validated this message.
+    uint64 last_validation_seq = 1;
+    // content is the fabric transaction
+    // that is forwarded to the cluster member.
+    common.Envelope payload = 2;
+}
+
+// TransactionOrderResponse returns a success
+// or failure status to the sender.
+message TransactionOrderResponse {
+    string channel = 1;
+    string tx_id = 2;
+    // Status code, which may be used to programatically respond to success/failure.
+    common.Status status = 3;
+    // Info string which may contain additional information about the returned status.
+    string info = 4;
+}
+
+// NodeAuthRequest for authenticate the stream 
+// between the cluster members
+message NodeAuthRequest {
+    // version represents the fields on which the signature is computed 
+    uint32 version = 1;
+    // signature is verifiable using the initiator's public key
+    bytes signature = 2;
+    // timestamp indicates the freshness of the request; expected to be within the margin
+    // of the responsder's local time
+    google.protobuf.Timestamp timestamp = 3;
+    // from_id is the numerical identifier of the initiator of the connection
+    uint64 from_id = 4;
+    // to_id is the numerical identifier of the node that is being connected to
+    uint64 to_id = 5;
+    // session_binding is verifiable using application level protocol 
+    bytes session_binding = 6;
+    string channel = 7;
+}
