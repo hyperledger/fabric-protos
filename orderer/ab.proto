@@ -64,10 +64,21 @@ message SeekInfo {
         STRICT = 0;
         BEST_EFFORT = 1;
     }
+
+    // SeekContentType indicates what type of content to deliver in response to a request. If BLOCK is specified,
+    // the orderer will stream blocks back to the peer. This is the default behavior. If HEADER_WITH_SIG is  specified, the
+    // orderer will stream only a the header and the signature, and the payload field will be set to nil. This allows
+    // the requester to ascertain that the respective signed block exists in the orderer (or cluster of orderers).
+    enum SeekContentType {
+        BLOCK = 0;
+        HEADER_WITH_SIG =1;
+    }
+    
     SeekPosition start = 1;               // The position to start the deliver from
     SeekPosition stop = 2;                // The position to stop the deliver
     SeekBehavior behavior = 3;            // The behavior when a missing block is encountered
     SeekErrorResponse error_response = 4; // How to respond to errors reported to the deliver service
+    SeekContentType content_type = 5;     // Defines what type of content to deliver in response to a request
 }
 
 message DeliverResponse {
