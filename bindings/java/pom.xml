@@ -36,8 +36,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <grpcVersion>1.45.1</grpcVersion>
-    <protobufVersion>3.19.4</protobufVersion>
+    <grpcVersion>1.49.2</grpcVersion>
+    <protobufVersion>3.21.7</protobufVersion>
   </properties>
 
   <dependencyManagement>
