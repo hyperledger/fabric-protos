@@ -234,7 +234,7 @@ $(GRPC_STATUS_PROTO):
 
 .PHONY: genprotos
 genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
-	buf generate --template buf.gen.yaml
+	buf generate --template buf.gen.yaml --path gateway --path common --path ledger --path msp --path orderer/ab.proto --path peer
 
 .PHONY: javabindings
 javabindings: genprotos
