@@ -76,14 +76,14 @@ jobs:
         git remote set-url origin git@github.com-fabric-protos-go-apiv2:hyperledger/fabric-protos-go-apiv2.git
       if: github.event_name != 'pull_request'
       working-directory: publish-apiv2
+      env:
+        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
 
     - name: Push GitHub apiv2 publish commit
       run: |
         git push origin
       if: github.ref == 'refs/heads/main'
       working-directory: publish-apiv2
-      env:
-        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
 
     - name: Tag apiv2 commit
       run: |
