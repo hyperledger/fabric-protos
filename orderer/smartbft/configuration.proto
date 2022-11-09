@@ -7,7 +7,7 @@ syntax = "proto3";
 option go_package = "github.com/hyperledger/fabric/protos/orderer/smartbft";
 option java_package = "org.hyperledger.fabric.protos.orderer.smartbft";
 
-package smartbft;
+package orderer.smartbft;
 
 // Options to be specified for all the smartbft nodes. These can be modified on a
 // per-channel basis.
