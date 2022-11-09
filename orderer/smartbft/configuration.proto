@@ -1,0 +1,43 @@
+// Copyright the Hyperledger Fabric contributors. All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+option go_package = "github.com/hyperledger/fabric/protos/orderer/smartbft";
+option java_package = "org.hyperledger.fabric.protos.orderer.smartbft";
+
+package smartbft;
+
+// Options to be specified for all the smartbft nodes. These can be modified on a
+// per-channel basis.
+message Options {
+    uint64 request_batch_max_count = 1;
+    uint64 request_batch_max_bytes = 2;
+    string request_batch_max_interval = 3;
+
+    uint64 incoming_message_buffer_size = 4;   
+
+    uint64 request_pool_size = 5;
+    string request_forward_timeout = 6;
+    string request_complain_timeout = 7;
+    string request_auto_remove_timeout = 8;
+    uint64 request_max_bytes = 9;
+
+    string view_change_resend_interval = 10;
+    string view_change_timeout = 11;
+    
+    string leader_heartbeat_timeout = 12;
+    uint64 leader_heartbeat_count = 13;
+
+    string collect_timeout = 14;
+    bool sync_on_start = 15;
+    bool speed_up_view_change = 16;
+    enum Rotation {
+        ROTATION_UNSPECIFIED = 0;
+        ROTATION_OFF = 1;
+        ROTATION_ON = 2;
+    }
+    Rotation leader_rotation = 17;
+    uint64 decisions_per_leader = 18;
+}

@@ -59,6 +59,7 @@ lint:
       - msp/msp_principal.proto
       - orderer/etcdraft/configuration.proto
       - orderer/etcdraft/metadata.proto
+      - orderer/smartbft/configuration.proto
       - peer/chaincode.proto
       - peer/chaincode_event.proto
       - peer/chaincode_shim.proto
