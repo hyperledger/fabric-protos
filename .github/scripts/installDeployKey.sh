@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -euo pipefail
+
 repo="${1:?}"
 deploy_key="${2:?}"
 
