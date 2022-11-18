@@ -5,10 +5,11 @@ The following artifacts are created or updated as a result of pushing changes to
 - Go repositories
     - [fabric-protos-go](https://github.com/hyperledger/fabric-protos-go)
     - [fabric-protos-go-apiv2](https://github.com/hyperledger/fabric-protos-go-apiv2)
-- npm modules
+- npm module
     - [@hyperledger/fabric-protos](https://www.npmjs.com/package/@hyperledger/fabric-protos)
 - Java libraries
-    - [fabric-protos](https://github.com/hyperledger/fabric-protos/packages/1412970)
+    - GitHub packages: [fabric-protos](https://github.com/hyperledger/fabric-protos/packages/1412970)
+    - Maven central repository: [fabric-protos](https://search.maven.org/artifact/org.hyperledger.fabric/fabric-protos) (tagged release only)
 
 ## Before releasing
 

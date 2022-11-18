@@ -11,7 +11,7 @@ on:
         value: ${{ jobs.check_version.outputs.binding_version }}
 
 env:
-  BINDING_VERSION: 0.3.0
+  BINDING_VERSION: 0.3.1
 
 jobs:
   check_release:
