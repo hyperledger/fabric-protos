@@ -2,10 +2,10 @@ name: Node.js Bindings
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 0.2.x ]
     tags: [ v** ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 0.2.x ]
   workflow_dispatch:
 
 jobs:
@@ -62,6 +62,6 @@ jobs:
       name: npm publish
       working-directory: bindings/node
       env:
-        NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
+        NPM_CONFIG_DRY_RUN: ${{ ( contains(fromJson('["refs/heads/main", "refs/heads/0.2.x"]'), github.ref) || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
         NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'latest' || 'unstable' }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
