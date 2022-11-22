@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/fabric-protos",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Node bindings for Hyperledger Fabric protocol buffers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
