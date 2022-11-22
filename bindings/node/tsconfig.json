@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "outDir": "lib",
+        "rootDir": "src",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noImplicitReturns": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/"
+    ]
+}

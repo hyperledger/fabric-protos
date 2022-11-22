@@ -1,0 +1,131 @@
+name: Go Bindings
+
+on:
+  push:
+    branches: [ main, 0.1.x ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main, 0.1.x ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Go bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        apiver: [apiv1, apiv2]
+
+    steps:
+    - name: Checkout (build)
+      uses: actions/checkout@v3
+      with:
+        path: build
+
+    - name: Checkout (publish)
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ matrix.apiver == 'apiv1' && 'hyperledger/fabric-protos-go' || 'hyperledger/fabric-protos-go-apiv2' }}
+        ref: 0.1.x
+        path: publish-${{ matrix.apiver }}
+
+    - name: Cache apiv1 build dependencies
+      uses: actions/cache@v3
+      if: matrix.apiver == 'apiv1'
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos-apiv1
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile.apiv1') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile.apiv1') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Cache apiv2 build dependencies
+      uses: actions/cache@v3
+      if: matrix.apiver == 'apiv2'
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+        check-latest: true
+        cache: true
+        cache-dependency-path: build/bindings/go-${{ matrix.apiver }}/go.sum
+
+    - name: Run make
+      run: make -f $MAKEFILE_NAME genprotos
+      working-directory: build
+      env:
+        MAKEFILE_NAME: ${{ matrix.apiver == 'apiv1' && 'Makefile.apiv1' || 'Makefile' }}
+
+    - name: Get commit message
+      run: echo "::set-output name=COMMIT_MESSAGE::$(git log --format=%B -n 1 $GITHUB_SHA)"
+      id: get-commit-message
+      working-directory: build
+
+    - name: Create publish commit
+      run: |
+        git config --global user.email "hyperledger-bot@hyperledger.org"
+        git config --global user.name "hyperledger-bot"
+        # delete everything except the .git directory!
+        find . -mindepth 1 -maxdepth 1 -name '.git' -prune -o -exec rm -rf {} \;
+        cp -a ../build/bindings/$BINDINGS_DIR/. .
+        git add -A
+        git diff --cached --quiet || git commit -m "$COMMIT_MESSAGE" --no-edit
+        git status
+        git log --name-status
+      working-directory: publish-${{ matrix.apiver }}
+      env:
+        BINDINGS_DIR: go-${{ matrix.apiver }}
+        COMMIT_MESSAGE: ${{ steps.get-commit-message.outputs.COMMIT_MESSAGE }}
+
+    - name: Set up apiv1 deploy key
+      run: |
+        ../build/.github/scripts/installDeployKey.sh fabric-protos-go $FABRIC_PROTOS_GO_DEPLOY_KEY
+        touch "${HOME}/.ssh/known_hosts"
+        ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
+        git remote set-url origin git@github.com-fabric-protos-go:hyperledger/fabric-protos-go.git
+      if: github.event_name != 'pull_request' && matrix.apiver == 'apiv1'
+      working-directory: publish-${{ matrix.apiver }}
+      env:
+        FABRIC_PROTOS_GO_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_DEPLOY_KEY }}
+
+    - name: Set up apiv2 deploy key
+      run: |
+        ../build/.github/scripts/installDeployKey.sh fabric-protos-go-apiv2 $FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY
+        touch "${HOME}/.ssh/known_hosts"
+        ssh-keyscan -H github.com >> "${HOME}/.ssh/known_hosts"
+        git remote set-url origin git@github.com-fabric-protos-go-apiv2:hyperledger/fabric-protos-go-apiv2.git
+      if: github.event_name != 'pull_request' && matrix.apiver == 'apiv2'
+      working-directory: publish-${{ matrix.apiver }}
+      env:
+        FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY: ${{ secrets.FABRIC_PROTOS_GO_APIV2_DEPLOY_KEY }}
+
+    - name: Push GitHub publish commit
+      run: |
+        git push origin
+      if: contains(fromJson('["refs/heads/main", "refs/heads/0.1.x"]'), github.ref)
+      working-directory: publish-${{ matrix.apiver }}
+
+    - name: Tag commit
+      run: |
+        git tag v${BINDING_VERSION}
+        git push origin v${BINDING_VERSION}
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      working-directory: publish-${{ matrix.apiver }}
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}

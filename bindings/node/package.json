@@ -1,0 +1,40 @@
+{
+  "name": "@hyperledger/fabric-protos",
+  "version": "0.1.6",
+  "description": "Node bindings for Hyperledger Fabric protocol buffers",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "/lib"
+  ],
+  "type": "commonjs",
+  "scripts": {
+    "compile": "tsc",
+    "postcompile": "npm run copyfiles",
+    "copyfiles": "cpy './src/**/*.d.ts' './src/**/*.js' lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/fabric-protos.git"
+  },
+  "author": {
+    "name": "hyperledger/fabric",
+    "email": "fabric@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/fabric"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/fabric-protos/issues"
+  },
+  "homepage": "https://github.com/hyperledger/fabric-protos#readme",
+  "devDependencies": {
+    "cpy-cli": "^4.1.0",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.5.9",
+    "@types/google-protobuf": "^3.15.5",
+    "google-protobuf": "^3.19.4"
+  }
+}

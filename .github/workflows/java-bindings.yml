@@ -1,0 +1,94 @@
+name: Java Bindings
+
+on:
+  push:
+    branches: [ main, 0.1.x ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main, 0.1.x ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Java bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - name: Set up Java for publishing to GitHub Packages
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+        cache: 'maven'
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Run make
+      run: make javabindings
+
+    - name: Set prerelease version
+      run: mvn --batch-mode versions:set -DnewVersion=${BINDING_VERSION}-dev-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}
+      if: needs.ci_checks.outputs.publish_release != 'true'
+      working-directory: bindings/java
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+
+    - name: Set release version
+      run: mvn --batch-mode versions:set -DnewVersion=${BINDING_VERSION}
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      working-directory: bindings/java
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+
+    - name: Publish to GitHub Packages
+      continue-on-error: true
+      run: mvn -P github --batch-mode deploy
+      if: github.event_name != 'pull_request'
+      working-directory: bindings/java
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Java for publishing to Maven Central Repository
+      uses: actions/setup-java@v3
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+        cache: 'maven'
+        server-id: ossrh
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
+        gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+    - name: Publish to the Maven Central Repository
+      run: mvn -P ossrh --batch-mode deploy
+      if: needs.ci_checks.outputs.publish_release == 'true'
+      working-directory: bindings/java
+      env:
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
