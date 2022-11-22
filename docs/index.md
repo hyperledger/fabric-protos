@@ -8,6 +8,14 @@ Hyperledger Fabric Protocol buffers
 
 Pregenerated libraries are available for Go, Java, and Node.js
 
+The following versions are available:
+
+- `v0.1.x` versions are intended for Fabric 2.4 releases
+- `v0.2.x` versions are intended for Fabric 2.5 releases
+- `v0.3.x` versions are intended for Fabric 3.0 releases
+
+**Important:** Current releases are all in the unstable v0.x.x range. A v0 version makes **no stability or backward compatibility guarantees**.
+
 ### Go
 
 ```
