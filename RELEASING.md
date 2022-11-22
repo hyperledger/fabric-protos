@@ -25,6 +25,8 @@ When drafting the release, create a new tag for the new version (with a `v` pref
 
 See previous releases for examples of the title and description.
 
+**Important:** make sure you target the correct branch when creating a release (see below for version details)
+
 ## After releasing
 
 The following tasks are required after releasing:
@@ -41,9 +43,9 @@ The Hyperledger Fabric protobufs and generated bindings follow the [Go module ve
 
 Use the following version numbers on each branch:
 
-- `release-2.4` should be versioned as `v0.1.x`
-- `release-2.5` should be versioned as `v0.2.x`
-- `main` should be versioned as `v0.3.x`
+- the `0.1.x` branch is intended for Fabric 2.4 releases and should be versioned as `v0.1.x`
+- the `0.2.x` branch is intended for Fabric 2.5 releases and should be versioned as `v0.2.x`
+- the `main` branch is intended for Fabric 3.0 releases and should be versioned as `v0.3.x`
 
 The following files need to be modified when updating the version number, and these are checked by the build process to ensure they match a tagged release:
 
