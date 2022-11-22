@@ -1,0 +1,7 @@
+version: v1
+plugins:
+  - name: go
+    out: bindings/go-apiv1
+    opt:
+      - paths=source_relative
+      - plugins=grpc

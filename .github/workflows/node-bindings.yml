@@ -1,0 +1,67 @@
+name: Node.js Bindings
+
+on:
+  push:
+    branches: [ main, 0.1.x ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main, 0.1.x ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Node.js bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache build dependencies
+      uses: actions/cache@v3
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+        cache: 'npm'
+        cache-dependency-path: bindings/node/package-lock.json
+        registry-url: https://registry.npmjs.org/
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Run make
+      run: make nodebindings
+
+    - run: npm version ${BINDING_VERSION}-dev.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}
+      name: npm version
+      if: needs.ci_checks.outputs.publish_release != 'true'
+      working-directory: bindings/node
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+
+    - run: |
+        [ "${NPM_CONFIG_DRY_RUN}" == "true" ] && echo "Dry run"
+        npm publish --access public --tag ${NPM_PUBLISH_TAG}
+      name: npm publish
+      working-directory: bindings/node
+      env:
+        NPM_CONFIG_DRY_RUN: ${{ ( contains(fromJson('["refs/heads/main", "refs/heads/0.1.x"]'), github.ref) || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
+        NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'latest' || 'unstable' }}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
