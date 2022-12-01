@@ -32,12 +32,20 @@
     <url>https://github.com/hyperledger/fabric-protos</url>
   </scm>
 
+  <!--
+    When updating the protobuf and grpc versions; it is important to keep these in sync. 
+    Specifically, the protobuf version should match (or at least be the same major/minor version) as the one depended on by grpc-protobuf.
+
+    Check the version of the protobuf that the grpc library uses
+
+  -->
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <grpcVersion>1.45.1</grpcVersion>
-    <protobufVersion>3.19.4</protobufVersion>
+    <grpcVersion>1.51.0</grpcVersion>
+    <protobufVersion>3.21.7</protobufVersion>
   </properties>
 
   <dependencyManagement>
