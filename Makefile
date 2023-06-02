@@ -25,20 +25,21 @@ HTTPS_GIT := https://github.com/hyperledger/fabric-protos.git
 SSH_GIT := ssh://git@github.com/hyperledger/fabric-protos.git
 
 # This controls the version of buf to install and use.
-BUF_VERSION := 1.1.1
+BUF_VERSION := 1.20.0
 # If true, Buf is installed from source instead of from releases
 BUF_INSTALL_FROM_SOURCE := false
 
-PROTOC_VERSION := 3.19.4
+PROTOC_VERSION := 23.2
 PROTOC_GEN_DOC_VERSION := 1.5.1
-PROTOC_GEN_GO_VERSION := 1.28.0
-PROTOC_GEN_GO_GRPC_VERSION := 1.2.0
-PROTOC_GEN_GRPC_JAVA_VERSION := 1.45.1
-GRPC_TOOLS_VERSION := 1.11.2
+PROTOC_GEN_GO_VERSION := 1.30.0
+PROTOC_GEN_GO_GRPC_VERSION := 1.3.0
+PROTOC_GEN_GRPC_JAVA_VERSION := 1.55.1
+PROTOC_GEN_JS_VERSION := 3.21.2
+GRPC_TOOLS_VERSION := 1.12.4
 TS_PROTOC_GEN_VERSION := 0.15.0
 
 # This is the commit hash for the https://github.com/googleapis/googleapis repo
-GRPC_STATUS_VERSION := 047d3a8ac7f75383855df0166144f891d7af08d9
+GRPC_STATUS_VERSION := f36c65081b19e0758ef5696feca27c7dcee5475e
 GRPC_STATUS_PROTO := google/rpc/status.proto
 
 ### Everything below this line is meant to be static, i.e. only adjust the above variables. ###
@@ -47,7 +48,11 @@ UNAME_OS := $(shell uname -s)
 UNAME_ARCH := $(shell uname -m)
 ifeq ($(UNAME_OS),Darwin)
 	PLATFORM := osx
-	PROTOC_ARCH := x86_64
+	ifeq ($(UNAME_ARCH),arm64)
+		PROTOC_ARCH := aarch_64
+	else
+		PROTOC_ARCH := x86_64
+	endif
 else
 	PROTOC_ARCH := $(UNAME_ARCH)
 endif
@@ -160,12 +165,31 @@ $(PROTOC_GEN_GRPC_JAVA):
 	@rm -f $(CACHE_BIN)/protoc-gen-grpc-java
 	@mkdir -p $(CACHE_BIN)
 	curl -sSL \
-		"https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/$(PROTOC_GEN_GRPC_JAVA_VERSION)/protoc-gen-grpc-java-$(PROTOC_GEN_GRPC_JAVA_VERSION)-$(PLATFORM)-$(UNAME_ARCH).exe" \
+		"https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/$(PROTOC_GEN_GRPC_JAVA_VERSION)/protoc-gen-grpc-java-$(PROTOC_GEN_GRPC_JAVA_VERSION)-$(PLATFORM)-$(PROTOC_ARCH).exe" \
 		-o "$(CACHE_BIN)/protoc-gen-grpc-java"
 	chmod +x "$(CACHE_BIN)/protoc-gen-grpc-java"
 	@rm -rf $(dir $(PROTOC_GEN_GRPC_JAVA))
 	@mkdir -p $(dir $(PROTOC_GEN_GRPC_JAVA))
 	@touch $(PROTOC_GEN_GRPC_JAVA)
+
+# PROTOC_GEN_JS points to the marker file for the installed version.
+#
+# If PROTOC_GEN_JS_VERSION is changed, the binary will be re-downloaded.
+PROTOC_GEN_JS := $(CACHE_VERSIONS)/protoc-gen-js/$(PROTOC_GEN_JS_VERSION)
+$(PROTOC_GEN_JS):
+	@rm -f $(CACHE_BIN)/protoc-gen-js
+	@mkdir -p $(CACHE_BIN)
+	$(eval PROTOC_GEN_JS_TMP := $(shell mktemp -d))
+	curl -sSL \
+		"https://github.com/protocolbuffers/protobuf-javascript/releases/download/v$(PROTOC_GEN_JS_VERSION)/protobuf-javascript-$(PROTOC_GEN_JS_VERSION)-$(PLATFORM)-$(PROTOC_ARCH).tar.gz" \
+		-o "$(PROTOC_GEN_JS_TMP)/protobuf-javascript.tar.gz"
+	tar xf "$(PROTOC_GEN_JS_TMP)/protobuf-javascript.tar.gz" -C "$(PROTOC_GEN_JS_TMP)" bin/protoc-gen-js
+	mv "$(PROTOC_GEN_JS_TMP)/bin/protoc-gen-js" "$(CACHE_BIN)"
+	chmod +x "$(CACHE_BIN)/protoc-gen-js"
+	@rm -rf $(PROTOC_GEN_JS_TMP)
+	@rm -rf $(dir $(PROTOC_GEN_JS))
+	@mkdir -p $(dir $(PROTOC_GEN_JS))
+	@touch $(PROTOC_GEN_JS)
 
 # GRPC_TOOLS points to the marker file for the installed version.
 #
@@ -199,7 +223,7 @@ all: lint javabindings nodebindings
 # deps allows us to install deps without running any checks.
 
 .PHONY: deps
-deps: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
+deps: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(PROTOC_GEN_JS) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
 
 .PHONY: lint
 lint: https
@@ -236,7 +260,7 @@ $(GRPC_STATUS_PROTO):
 		-o "$(GRPC_STATUS_PROTO)"
 
 .PHONY: genprotos
-genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_STATUS_PROTO)
+genprotos: deps $(GRPC_STATUS_PROTO)
 	buf generate --template buf.gen.yaml
 
 .PHONY: javabindings
@@ -247,6 +271,24 @@ javabindings: genprotos
 nodebindings: genprotos
 	./scripts/generate_node_indexes.sh bindings/node/src
 	cd bindings/node && npm ci && npm run compile
+
+.PHONY: scan
+scan: scan-go scan-java scan-node
+
+.PHONY: scan-go
+scan-go: genprotos
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+	cd bindings/go-apiv2 && govulncheck ./...
+
+.PHONY: scan-java
+scan-java: javabindings
+	go install github.com/google/osv-scanner/cmd/osv-scanner@latest
+	cd bindings/java && mvn --activate-profiles sbom -DskipTests install
+	osv-scanner --sbom=bindings/java/target/bom.json
+
+.PHONY: scan-node
+scan-node:
+	cd bindings/node && npm ci && npm audit --omit=dev
 
 # clean deletes any files not checked in and the cache for all platforms.
 
