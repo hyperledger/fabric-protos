@@ -155,10 +155,17 @@ message CheckCommitReadinessArgs {
 
 // CheckCommitReadinessResult is the message returned by
 // `_lifecycle.CheckCommitReadiness`. It returns a map of
-// orgs to their approval (true/false) for the definition 
-// supplied as args.
+// orgs to their approval (true/false) for the definition
+// supplied as args. Additionally, it returns a map of
+// parameter mismatches between each organization's
+// approved definition and the definition supplied as args.
 message CheckCommitReadinessResult{
     map<string, bool> approvals = 1;
+
+    message Mismatches {
+        repeated string items = 1;
+    }
+    map<string, Mismatches> mismatches = 2;
 }
 
 // QueryApprovedChaincodeDefinitionArgs is the message used as arguments to
