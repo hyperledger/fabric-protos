@@ -8,3 +8,10 @@
 /build
 .idea
 .vscode
+
+/docs/protos.md
+/google
+/bindings/go-apiv1/**/*.pb.go
+/bindings/go-apiv2/**/*.pb.go
+/bindings/java/src
+/bindings/node/src
