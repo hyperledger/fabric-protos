@@ -63,5 +63,5 @@ jobs:
       working-directory: bindings/node
       env:
         NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
-        NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'latest' || 'unstable' }}
+        NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'next' || 'next-unstable' }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
