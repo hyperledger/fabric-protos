@@ -188,6 +188,27 @@ message QueryApprovedChaincodeDefinitionResult {
     ChaincodeSource source = 8;
 }
 
+// QueryApprovedChaincodeDefinitionsArgs is the message used as arguments to
+// `_lifecycle.QueryApprovedChaincodeDefinitions`.
+message QueryApprovedChaincodeDefinitionsArgs  { }
+
+// QueryApprovedChaincodeDefinitionsResult is the message returned by
+// `_lifecycle.QueryApprovedChaincodeDefinitions`.
+message QueryApprovedChaincodeDefinitionsResult {
+    message ApprovedChaincodeDefinition {
+        string name = 1;
+        int64 sequence = 2;
+        string version = 3;
+        string endorsement_plugin = 4;
+        string validation_plugin = 5;
+        bytes validation_parameter = 6;
+        protos.CollectionConfigPackage collections = 7;
+        bool init_required = 8;
+        ChaincodeSource source = 9;
+    }
+    repeated ApprovedChaincodeDefinition approved_chaincode_definitions = 1;
+}
+
 // QueryChaincodeDefinitionArgs is the message used as arguments to
 // `_lifecycle.QueryChaincodeDefinition`.
 message QueryChaincodeDefinitionArgs {
