@@ -47,11 +47,16 @@ Use the following version numbers on each branch:
 - the `0.2.x` branch is intended for Fabric 2.5 releases and should be versioned as `v0.2.x`
 - the `main` branch is intended for Fabric 3.0 releases and should be versioned as `v0.3.x`
 
+Note that for NPM packages the following convention will be used for each of the three branches:
+
+- `v1` and `v1-unstable` tags for the 0.1.x branch - corresponding to Fabric v2.4 and earlier.
+- `latest` and `unstable` tags for the 0.2.x branch - corresponding to Fabric v2.5 LTS.
+- `next` and `next-unstable` tags for releases and pushed commits to the main branch - corresponding to Fabric v3 (beta).
+
 The following files need to be modified when updating the version number, and these are checked by the build process to ensure they match a tagged release:
 
 - The `BINDING_VERSION` variable in `.github/workflows/ci-checks.yml`
 - The `version` element in `bindings/java/pom.xml`
-- The `version` property in `bindings/node/package.json`
-  (The `bindings/node/package-lock.json` should also be updated with the new version.)
+- The `version` property in `bindings/node/package.json` and `bindings/node/package-lock.json`
 
 **Note:** there is no file to update for the Go bindings, since these are versioned by the release tag.
