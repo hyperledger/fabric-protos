@@ -23,6 +23,8 @@ Creating a GitHub release on the [releases page](https://github.com/hyperledger/
 
 When drafting the release, create a new tag for the new version (with a `v` prefix), e.g. `vX.Y.Z`
 
+The CI actions triggered from a tag will set publish_release to 'true' causing downstream artifacts to be published.
+
 See previous releases for examples of the title and description.
 
 **Important:** make sure you target the correct branch when creating a release (see below for version details)
