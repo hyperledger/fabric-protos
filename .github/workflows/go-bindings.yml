@@ -72,7 +72,7 @@ jobs:
         MAKEFILE_NAME: ${{ matrix.apiver == 'apiv1' && 'Makefile.apiv1' || 'Makefile' }}
 
     - name: Get commit message
-      run: echo "::set-output name=COMMIT_MESSAGE::$(git log --format=%B -n 1 $GITHUB_SHA)"
+      run: echo "COMMIT_MESSAGE=$(git log --format=%B -n 1 $GITHUB_SHA)" >> $GITHUB_OUTPUT
       id: get-commit-message
       working-directory: build
 
