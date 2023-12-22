@@ -29,9 +29,9 @@ jobs:
         git fetch --tags origin
         TAGS=$(git tag --points-at HEAD | { grep -c "^v${BINDING_VERSION}$" || :; })
         if [ "${GITHUB_EVENT_NAME}" != "pull_request" ] && [ $TAGS -eq 1 ]; then
-          echo "::set-output name=publish_release::true"
+          echo "publish_release=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=publish_release::false"
+          echo "publish_release=false" >> $GITHUB_OUTPUT
         fi
 
   check_version:
