@@ -5,9 +5,6 @@ Tools like `protoc` can transform these definitions into code that can be used b
 
 ## Building and testing
 
-Note: there are currently two build processes- an Azure devops based build for Go bindings and a newer GitHub Actions based build for Java and Node.js bindings.
-The intention is to move everything to the new GitHub Actions build, which uses the Makefile described below.
-
 ### Build using make
 
 The following Makefile targets are available:
@@ -16,6 +13,11 @@ The following Makefile targets are available:
 - `make javabindings` - run Java bindings code generation
 - `make nodebindings` - run Node.js bindings code generation
 
+Note: there is a separate Makefile for the original version of Go protocol buffers APIv1, which you can specifiy using `make -f Makefile.apiv1 ...`
+
+See [A new Go API for Protocol Buffers][apiv2] for details of the Go protocol buffers APIv1 and APIv2.
+
 [Buf]: https://github.com/bufbuild/buf
 [grpc]: https://grpc.io/docs/guides/
 [protobuf]: https://github.com/protocolbuffers/protobuf/
+[apiv2]: https://go.dev/blog/protobuf-apiv2
