@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Cache build dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: makefile-deps
       with:
@@ -32,7 +32,7 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
           ${{ runner.os }}-${{ env.cache-name }}-
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: 14
         cache: 'npm'
@@ -40,9 +40,10 @@ jobs:
         registry-url: https://registry.npmjs.org/
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.21.6
+        cache: false
 
     - name: Run make
       run: make nodebindings

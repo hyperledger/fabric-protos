@@ -19,17 +19,17 @@ jobs:
 
     steps:
     - name: Checkout (build)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: build
 
     - name: Checkout (publish)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: publish
 
     - name: Cache build dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: makefile-deps
       with:
@@ -40,9 +40,10 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-
 
     - name: Set up Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.21.6
+        cache: false
 
     - name: Run make
       run: make genprotos
