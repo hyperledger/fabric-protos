@@ -25,12 +25,12 @@ HTTPS_GIT := https://github.com/hyperledger/fabric-protos.git
 SSH_GIT := ssh://git@github.com/hyperledger/fabric-protos.git
 
 # This controls the version of buf to install and use.
-BUF_VERSION := 1.1.1
+BUF_VERSION := 1.30.1
 # If true, Buf is installed from source instead of from releases
 BUF_INSTALL_FROM_SOURCE := false
 
-PROTOC_VERSION := 3.19.4
-PROTOC_GEN_GO_VERSION := v1.3.2
+PROTOC_VERSION := 25.3
+PROTOC_GEN_GO_VERSION := 1.5.4
 
 ### Everything below this line is meant to be static, i.e. only adjust the above variables. ###
 
@@ -109,7 +109,7 @@ $(PROTOC_GEN_GO):
 	@rm -f $(CACHE_BIN)/protoc-gen-go
 	@mkdir -p $(CACHE_BIN)
 	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_TMP); go install github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	cd $(PROTOC_GEN_GO_TMP); go install github.com/golang/protobuf/protoc-gen-go@v$(PROTOC_GEN_GO_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_TMP)
 	@rm -rf $(dir $(PROTOC_GEN_GO))
 	@mkdir -p $(dir $(PROTOC_GEN_GO))
@@ -128,6 +128,15 @@ deps: $(BUF) $(PROTOC) $(PROTOC_GEN_GO)
 .PHONY: genprotos
 genprotos: $(BUF) $(PROTOC) $(PROTOC_GEN_GO)
 	buf generate --template buf.gen-apiv1.yaml
+
+.PHONY: scan
+scan: scan-go
+
+.PHONY: scan-go
+scan-go: genprotos
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+	cd bindings/go-apiv1 && govulncheck ./...
+
 
 .PHONY: cleandep
 cleandep:
