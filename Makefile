@@ -25,7 +25,7 @@ HTTPS_GIT := https://github.com/hyperledger/fabric-protos.git
 SSH_GIT := ssh://git@github.com/hyperledger/fabric-protos.git
 
 # This controls the version of buf to install and use.
-BUF_VERSION := 1.30.1
+BUF_VERSION := 1.32.2
 # If true, Buf is installed from source instead of from releases
 BUF_INSTALL_FROM_SOURCE := false
 
