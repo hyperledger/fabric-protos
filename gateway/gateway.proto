@@ -4,6 +4,7 @@
 
 syntax = "proto3";
 
+option csharp_namespace = "Hyperledger.Fabric.Protos.Gateway";
 option go_package = "github.com/hyperledger/fabric-protos-go/gateway";
 option java_multiple_files = true;
 option java_package = "org.hyperledger.fabric.protos.gateway";
