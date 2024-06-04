@@ -1,6 +1,6 @@
-version: v1
+version: v2
 plugins:
-  - name: go
+  - local: protoc-gen-go
     out: bindings/go-apiv1
     opt:
       - paths=source_relative

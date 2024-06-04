@@ -1,11 +1,14 @@
-version: v1
-build:
-  excludes:
-    - bindings
+version: v2
+modules:
+  - path: .
+    excludes:
+      - bindings
 lint:
   use:
     - DEFAULT
   except:
+    - FIELD_NOT_REQUIRED
+    - PACKAGE_NO_IMPORT_CYCLE
     - PACKAGE_VERSION_SUFFIX
   ignore:
     - google
@@ -123,12 +126,16 @@ lint:
       - gateway/gateway.proto
       - gossip/message.proto
       - orderer/ab.proto
-      - orderer/cluster.proto
       - orderer/blockattestation.proto
+      - orderer/cluster.proto
       - peer/chaincode_shim.proto
       - peer/events.proto
       - peer/peer.proto
       - peer/snapshot.proto
+  disallow_comment_ignores: true
 breaking:
   use:
     - FILE
+  except:
+    - EXTENSION_NO_DELETE
+    - FIELD_SAME_DEFAULT
