@@ -2,6 +2,8 @@ version: v2
 managed:
   enabled: true
   override:
+    - file_option: csharp_namespace_prefix
+      value: Hyperledger.Fabric.Protos
     - file_option: java_multiple_files
       value: true
     - file_option: java_package_prefix
@@ -11,15 +13,39 @@ managed:
     - file_option: java_outer_classname
       path: common/configtx.proto
       value: ConfigTxProto
+    - file_option: csharp_namespace
+      path: ledger/queryresult/kv_query_result.proto
+      value: Hyperledger.Fabric.Protos.Ledger.QueryResult
     - file_option: java_outer_classname
       path: ledger/queryresult/kv_query_result.proto
       value: KVQueryResultProto
+    - file_option: java_package
+      path: ledger/queryresult/kv_query_result.proto
+      value: org.hyperledger.fabric.protos.ledger.queryresult
+    - file_option: csharp_namespace
+      path: ledger/rwset/kvrwset/kv_rwset.proto
+      value: Hyperledger.Fabric.Protos.Ledger.RWSet.KVRWSet
     - file_option: java_outer_classname
       path: ledger/rwset/kvrwset/kv_rwset.proto
       value: KVRWSetProto
+    - file_option: java_package
+      path: ledger/rwset/kvrwset/kv_rwset.proto
+      value: org.hyperledger.fabric.protos.ledger.rwset.kvrwset
+    - file_option: csharp_namespace
+      path: ledger/rwset/rwset.proto
+      value: Hyperledger.Fabric.Protos.Ledger.RWSet
     - file_option: java_outer_classname
       path: ledger/rwset/rwset.proto
       value: RWSetProto
+    - file_option: java_package
+      path: ledger/rwset/rwset.proto
+      value: org.hyperledger.fabric.protos.ledger.rwset
+    - file_option: csharp_namespace
+      path: msp/identities.proto
+      value: Hyperledger.Fabric.Protos.MSP
+    - file_option: csharp_namespace
+      path: msp/msp_config.proto
+      value: Hyperledger.Fabric.Protos.MSP
     - file_option: java_outer_classname
       path: msp/msp_config.proto
       value: MSPConfigProto
@@ -27,81 +53,149 @@ managed:
       path: msp/msp_principal.proto
       value: MSPPrincipalProto
     - file_option: java_package
-      path: google/rpc/status.proto
-      value: com.google.rpc
-    - file_option: java_package
-      path: ledger/queryresult/kv_query_result.proto
-      value: org.hyperledger.fabric.protos.ledger.queryresult
-    - file_option: java_package
-      path: ledger/rwset/kvrwset/kv_rwset.proto
-      value: org.hyperledger.fabric.protos.ledger.rwset.kvrwset
-    - file_option: java_package
-      path: ledger/rwset/rwset.proto
-      value: org.hyperledger.fabric.protos.ledger.rwset
-    - file_option: java_package
       path: msp/msp_principal.proto
       value: org.hyperledger.fabric.protos.common
+    - file_option: csharp_namespace
+      path: google/rpc/status.proto
+      value: Google.Rpc
+    - file_option: java_package
+      path: google/rpc/status.proto
+      value: com.google.rpc
+    - file_option: csharp_namespace
+      path: orderer/etcdraft/configuration.proto
+      value: Hyperledger.Fabric.Protos.Orderer.EtcdRaft
     - file_option: java_package
       path: orderer/etcdraft/configuration.proto
       value: org.hyperledger.fabric.protos.orderer.etcdraft
+    - file_option: csharp_namespace
+      path: orderer/etcdraft/metadata.proto
+      value: Hyperledger.Fabric.Protos.Orderer.EtcdRaft
     - file_option: java_package
       path: orderer/etcdraft/metadata.proto
       value: org.hyperledger.fabric.protos.orderer.etcdraft
+    - file_option: csharp_namespace
+      path: orderer/smartbft/configuration.proto
+      value: Hyperledger.Fabric.Protos.Orderer.SmartBFT
+    - file_option: csharp_namespace
+      path: peer/chaincode.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/chaincode.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/chaincode_event.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/chaincode_event.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/chaincode_shim.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/chaincode_shim.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/collection.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/collection.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/configuration.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/configuration.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/events.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/events.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/lifecycle/chaincode_definition.proto
+      value: Hyperledger.Fabric.Protos.Peer.Lifecycle
     - file_option: java_package
       path: peer/lifecycle/chaincode_definition.proto
       value: org.hyperledger.fabric.protos.peer.lifecycle
+    - file_option: csharp_namespace
+      path: peer/lifecycle/db.proto
+      value: Hyperledger.Fabric.Protos.Peer.Lifecycle
     - file_option: java_package
       path: peer/lifecycle/db.proto
       value: org.hyperledger.fabric.protos.peer.lifecycle
+    - file_option: csharp_namespace
+      path: peer/lifecycle/lifecycle.proto
+      value: Hyperledger.Fabric.Protos.Peer.Lifecycle
     - file_option: java_package
       path: peer/lifecycle/lifecycle.proto
       value: org.hyperledger.fabric.protos.peer.lifecycle
+    - file_option: csharp_namespace
+      path: peer/peer.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/peer.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/policy.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/policy.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/proposal.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/proposal.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/proposal_response.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/proposal_response.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/query.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/query.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/resources.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/resources.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/signed_cc_dep_spec.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/signed_cc_dep_spec.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/snapshot.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/snapshot.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: peer/transaction.proto
+      value: Hyperledger.Fabric.Protos.Peer
     - file_option: java_package
       path: peer/transaction.proto
       value: org.hyperledger.fabric.protos.peer
+    - file_option: csharp_namespace
+      path: transientstore/transientstore.proto
+      value: Hyperledger.Fabric.Protos.TransientStore
 plugins:
+  - protoc_builtin: csharp
+    out: bindings/csharp/src
+    opt:
+      - base_namespace=
+  - local: grpc_csharp_plugin
+    out: bindings/csharp/src
+    opt:
+      - base_namespace=
   - local: protoc-gen-doc
     out: docs
     opt:
