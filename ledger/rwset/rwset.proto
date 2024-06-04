@@ -4,6 +4,7 @@
 
 syntax = "proto3";
 
+option csharp_namespace = "Hyperledger.Fabric.Protos.Ledger.RWSet";
 option go_package = "github.com/hyperledger/fabric-protos-go/ledger/rwset";
 option java_package = "org.hyperledger.fabric.protos.ledger.rwset";
 
