@@ -37,6 +37,7 @@ PROTOC_GEN_GRPC_JAVA_VERSION := 1.63.0
 PROTOC_GEN_JS_VERSION := 3.21.2
 GRPC_TOOLS_VERSION := 1.12.4
 TS_PROTOC_GEN_VERSION := 0.15.0
+GRPC_CSHARP_PLUGIN_VERSION := 2.64.0
 
 # This is the commit hash for the https://github.com/googleapis/googleapis repo
 GRPC_STATUS_VERSION := f36c65081b19e0758ef5696feca27c7dcee5475e
@@ -215,6 +216,27 @@ $(TS_PROTOC_GEN):
 	@mkdir -p $(dir $(TS_PROTOC_GEN))
 	@touch $(TS_PROTOC_GEN)
 
+# GRPC_CSHARP_PLUGIN points to the marker file for the installed version.
+#
+# If GRPC_CSHARP_PLUGIN_VERSION is changed, the binary will be re-downloaded.
+#
+# TODO: no arm mac version
+GRPC_CSHARP_PLUGIN := $(CACHE_VERSIONS)/grpc_csharp_plugin/$(GRPC_CSHARP_PLUGIN_VERSION)
+$(GRPC_CSHARP_PLUGIN):
+	@rm -f $(CACHE_BIN)/grpc_csharp_plugin
+	@mkdir -p $(CACHE_BIN)
+	$(eval GRPC_CSHARP_PLUGIN_TMP := $(shell mktemp -d))
+	curl -sSL \
+		"https://www.nuget.org/api/v2/package/Grpc.Tools/$(GRPC_CSHARP_PLUGIN_VERSION)" \
+		-o "$(GRPC_CSHARP_PLUGIN_TMP)/grpc.tools.$(GRPC_CSHARP_PLUGIN_VERSION).nupkg"
+	unzip -o "$(GRPC_CSHARP_PLUGIN_TMP)/grpc.tools.$(GRPC_CSHARP_PLUGIN_VERSION).nupkg" -d "$(GRPC_CSHARP_PLUGIN_TMP)" tools/macosx_x64/grpc_csharp_plugin
+	mv "$(GRPC_CSHARP_PLUGIN_TMP)/tools/macosx_x64/grpc_csharp_plugin" "$(CACHE_BIN)"
+	chmod +x "$(CACHE_BIN)/grpc_csharp_plugin"
+	@rm -rf $(GRPC_CSHARP_PLUGIN_TMP)
+	@rm -rf $(dir $(GRPC_CSHARP_PLUGIN))
+	@mkdir -p $(dir $(GRPC_CSHARP_PLUGIN))
+	@touch $(GRPC_CSHARP_PLUGIN)
+
 .DEFAULT_GOAL := all
 
 .PHONY: all
@@ -223,7 +245,7 @@ all: lint javabindings nodebindings
 # deps allows us to install deps without running any checks.
 
 .PHONY: deps
-deps: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(PROTOC_GEN_JS) $(GRPC_TOOLS) $(TS_PROTOC_GEN)
+deps: $(BUF) $(PROTOC) $(PROTOC_GEN_DOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC) $(PROTOC_GEN_GRPC_JAVA) $(PROTOC_GEN_JS) $(GRPC_TOOLS) $(TS_PROTOC_GEN) $(GRPC_CSHARP_PLUGIN)
 
 .PHONY: lint
 lint: https
