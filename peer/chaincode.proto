@@ -126,3 +126,9 @@ message ChaincodeData {
     // InstantiationPolicy for the chaincode
     common.SignaturePolicyEnvelope instantiation_policy = 8;
 }
+
+// ChaincodeAdditionalParams - parameters passed to chaincode to notify about peer capabilities
+message ChaincodeAdditionalParams {
+    bool use_write_batch = 1; // an indication that the peer can handle state write batches
+    uint32 max_size_write_batch = 2; // maximum size of batches with write state
+}
