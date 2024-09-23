@@ -3,6 +3,10 @@
 This repository contains the [grpc] service and [protocol buffer][protobuf] definitions for the Hyperledger Fabric project.
 Tools like `protoc` can transform these definitions into code that can be used by clients and libraries to interact with Fabric.
 
+Language bindings for Go, Node and Java are generated from the protocol buffer definitions within this repository, and published for use by other projects. For more information, please see the [documentation](https://hyperledger.github.io/fabric-protos/).
+
+Issues and pull requests related to any of the published language bindings should be raised in this repository.
+
 ## Building and testing
 
 ### Build using make

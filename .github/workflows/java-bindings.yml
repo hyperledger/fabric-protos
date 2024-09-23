@@ -35,14 +35,14 @@ jobs:
     - name: Set up Java for publishing to GitHub Packages
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
-        java-version: '8'
-        cache: 'maven'
+        distribution: temurin
+        java-version: 21
+        cache: maven
 
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.6
+        go-version: stable
         cache: false
 
     - name: Run make
@@ -76,9 +76,9 @@ jobs:
       uses: actions/setup-java@v4
       if: needs.ci_checks.outputs.publish_release == 'true'
       with:
-        distribution: 'temurin'
-        java-version: '8'
-        cache: 'maven'
+        distribution: temurin
+        java-version: 21
+        cache: maven
         server-id: ossrh
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
