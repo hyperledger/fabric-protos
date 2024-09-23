@@ -25,21 +25,21 @@ HTTPS_GIT := https://github.com/hyperledger/fabric-protos.git
 SSH_GIT := ssh://git@github.com/hyperledger/fabric-protos.git
 
 # This controls the version of buf to install and use.
-BUF_VERSION := 1.32.2
+BUF_VERSION := 1.42.0
 # If true, Buf is installed from source instead of from releases
 BUF_INSTALL_FROM_SOURCE := false
 
-PROTOC_VERSION := 25.3
+PROTOC_VERSION := 28.2
 PROTOC_GEN_DOC_VERSION := 1.5.1
-PROTOC_GEN_GO_VERSION := 1.33.0
-PROTOC_GEN_GO_GRPC_VERSION := 1.3.0
-PROTOC_GEN_GRPC_JAVA_VERSION := 1.63.0
-PROTOC_GEN_JS_VERSION := 3.21.2
+PROTOC_GEN_GO_VERSION := 1.34.2
+PROTOC_GEN_GO_GRPC_VERSION := 1.5.1
+PROTOC_GEN_GRPC_JAVA_VERSION := 1.68.0
+PROTOC_GEN_JS_VERSION := 3.21.4
 GRPC_TOOLS_VERSION := 1.12.4
 TS_PROTOC_GEN_VERSION := 0.15.0
 
 # This is the commit hash for the https://github.com/googleapis/googleapis repo
-GRPC_STATUS_VERSION := f36c65081b19e0758ef5696feca27c7dcee5475e
+GRPC_STATUS_VERSION := 3597f7db2191c00b100400991ef96e52d62f5841
 GRPC_STATUS_PROTO := google/rpc/status.proto
 
 ### Everything below this line is meant to be static, i.e. only adjust the above variables. ###
@@ -281,14 +281,16 @@ scan-go: genprotos
 	cd bindings/go-apiv2 && govulncheck ./...
 
 .PHONY: scan-java
-scan-java: javabindings
+scan-java:
 	go install github.com/google/osv-scanner/cmd/osv-scanner@latest
-	cd bindings/java && mvn --activate-profiles sbom -DskipTests install
-	osv-scanner --sbom=bindings/java/target/bom.json
+	osv-scanner scan --lockfile=bindings/java/pom.xml
 
 .PHONY: scan-node
 scan-node:
-	cd bindings/node && npm ci && npm audit --omit=dev
+	go install github.com/google/osv-scanner/cmd/osv-scanner@latest
+	cd bindings/node && \
+		npm sbom --omit dev --package-lock-only --sbom-format cyclonedx > bom.json && \
+		osv-scanner scan --sbom=bom.json
 
 # clean deletes any files not checked in and the cache for all platforms.
 
