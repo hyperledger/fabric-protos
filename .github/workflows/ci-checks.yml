@@ -45,8 +45,8 @@ jobs:
 
     - uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
-        java-version: '8'
+        distribution: temurin
+        java-version: 21
 
     - name: Check package.json version
       working-directory: bindings/node
@@ -74,7 +74,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.6
+        go-version: stable
         cache: false
 
     - name: Cache build dependencies
