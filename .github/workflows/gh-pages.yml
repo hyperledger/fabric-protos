@@ -2,9 +2,9 @@ name: GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -18,51 +18,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout (build)
-      uses: actions/checkout@v4
-      with:
-        path: build
+      - name: Checkout (build)
+        uses: actions/checkout@v4
+        with:
+          path: build
 
-    - name: Checkout (publish)
-      uses: actions/checkout@v4
-      with:
-        path: publish
+      - name: Checkout (publish)
+        uses: actions/checkout@v4
+        with:
+          path: publish
 
-    - name: Cache build dependencies
-      uses: actions/cache@v4
-      env:
-        cache-name: makefile-deps
-      with:
-        path: ~/.cache/fabric-protos
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
-          ${{ runner.os }}-${{ env.cache-name }}-
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        env:
+          cache-name: makefile-deps
+        with:
+          path: ~/.cache/fabric-protos
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+            ${{ runner.os }}-${{ env.cache-name }}-
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: 1.20.2
-        cache: false
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
 
-    - name: Run make
-      run: make genprotos
-      working-directory: build
+      - name: Run make
+        run: make genprotos
+        working-directory: build
 
-    - name: Create GitHub pages commit
-      run: |
-        git config --global user.email "hyperledger-bot@hyperledger.org"
-        git config --global user.name "hyperledger-bot"
-        git checkout --orphan publish-pages
-        git rm -rf .
-        cp -a ../build/docs/. .
-        git add -A
-        git commit -m "Deploy to GitHub Pages"
-        git status
-        git log --name-status
-      working-directory: publish
+      - name: Create GitHub pages commit
+        run: |
+          git config --global user.email "hyperledger-bot@hyperledger.org"
+          git config --global user.name "hyperledger-bot"
+          git checkout --orphan publish-pages
+          git rm -rf .
+          cp -a ../build/docs/. .
+          git add -A
+          git commit -m "Deploy to GitHub Pages"
+          git status
+          git log --name-status
+        working-directory: publish
 
-    - name: Push GitHub pages commit
-      run: git push --force origin publish-pages:gh-pages
-      if: github.event_name != 'pull_request'
-      working-directory: publish
+      - name: Push GitHub pages commit
+        run: git push --force origin publish-pages:gh-pages
+        if: github.event_name != 'pull_request'
+        working-directory: publish
