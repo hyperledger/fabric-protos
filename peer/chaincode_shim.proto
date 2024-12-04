@@ -38,6 +38,7 @@ message ChaincodeMessage {
         PUT_STATE_METADATA = 21;
         GET_PRIVATE_DATA_HASH = 22;
         PURGE_PRIVATE_DATA = 23;
+        WRITE_BATCH_STATE = 24;
     }
 
     Type type = 1;
@@ -86,6 +87,29 @@ message PutStateMetadata {
     string key = 1;
     string collection = 3;
     StateMetadata metadata = 4;
+}
+
+// WriteBatchState - set of records for state changes sent by the batch
+message WriteBatchState {
+    repeated WriteRecord rec = 1;
+}
+
+// WriteRecord - single record with changes in the state of different types.
+// Filled in depending on the type.
+message WriteRecord {
+    enum Type {
+        UNDEFINED = 0;
+        PUT_STATE = 9;
+        DEL_STATE = 10;
+        PUT_STATE_METADATA = 21;
+        PURGE_PRIVATE_DATA = 23;
+    }
+
+    string key = 1;
+    bytes value = 2;
+    string collection = 3;
+    StateMetadata metadata = 4;
+    Type type = 5;
 }
 
 // DelState is the payload of a ChaincodeMessage. It contains a key which
