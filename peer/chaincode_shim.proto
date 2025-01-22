@@ -39,6 +39,7 @@ message ChaincodeMessage {
         GET_PRIVATE_DATA_HASH = 22;
         PURGE_PRIVATE_DATA = 23;
         WRITE_BATCH_STATE = 24;
+        GET_STATE_MULTIPLE = 25;
     }
 
     Type type = 1;
@@ -71,6 +72,20 @@ message GetState {
 message GetStateMetadata {
     string key = 1;
     string collection = 2;
+}
+
+// GetStateMultiple is the payload of the ChaincodeMessage.
+// It contains the keys to be retrieved from the ledger.
+// If a collection is specified, the keys will be retrieved
+// from the collection (i.e., the private state).
+message GetStateMultiple {
+    repeated string keys = 1;
+    string collection = 2;
+}
+
+// GetStateMultipleResult is result of executing the GetStateMiltiple request
+message GetStateMultipleResult {
+    repeated bytes values = 1;
 }
 
 // PutState is the payload of a ChaincodeMessage. It contains a key and value

@@ -131,4 +131,6 @@ message ChaincodeData {
 message ChaincodeAdditionalParams {
     bool use_write_batch = 1; // an indication that the peer can handle state write batches
     uint32 max_size_write_batch = 2; // maximum size of batches with write state
+    bool use_get_multiple_keys = 3; // an indication that the peer can handle get multiple keys
+    uint32 max_size_get_multiple_keys = 4; // maximum size of batches with get multiple keys
 }
