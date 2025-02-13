@@ -50,7 +50,6 @@ lint:
     ONEOF_LOWER_SNAKE_CASE:
       - common/policies.proto
       - orderer/ab.proto
-      - orderer/blockattestation.proto
       - peer/events.proto
       - peer/lifecycle/db.proto
       - peer/lifecycle/lifecycle.proto
@@ -99,7 +98,6 @@ lint:
     RPC_REQUEST_RESPONSE_UNIQUE:
       - gossip/message.proto
       - orderer/ab.proto
-      - orderer/blockattestation.proto
       - peer/chaincode_shim.proto
       - peer/events.proto
       - peer/snapshot.proto
@@ -108,7 +106,6 @@ lint:
       - gateway/gateway.proto
       - gossip/message.proto
       - orderer/ab.proto
-      - orderer/blockattestation.proto
       - peer/chaincode_shim.proto
       - peer/events.proto
       - peer/peer.proto
@@ -116,7 +113,6 @@ lint:
     RPC_RESPONSE_STANDARD_NAME:
       - discovery/protocol.proto
       - gossip/message.proto
-      - orderer/blockattestation.proto
       - peer/chaincode_shim.proto
       - peer/events.proto
       - peer/peer.proto
@@ -126,7 +122,6 @@ lint:
       - gateway/gateway.proto
       - gossip/message.proto
       - orderer/ab.proto
-      - orderer/blockattestation.proto
       - orderer/cluster.proto
       - peer/chaincode_shim.proto
       - peer/events.proto
