@@ -8,6 +8,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   ci_checks:
     name: Build checks
@@ -39,6 +43,10 @@ jobs:
         cache-dependency-path: bindings/node/package-lock.json
         registry-url: https://registry.npmjs.org/
 
+    # anchor to the smallest npm version supporting trusted publishing
+    - name: Update npm
+      run: npm install -g npm@11.5.1
+
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
@@ -65,4 +73,3 @@ jobs:
       env:
         NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
         NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'next' || 'next-unstable' }}
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
