@@ -23,12 +23,12 @@ jobs:
 
     steps:
     - name: Checkout (build)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: build
 
     - name: Checkout (publish)
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: ${{ matrix.apiver == 'apiv1' && 'hyperledger/fabric-protos-go' || 'hyperledger/fabric-protos-go-apiv2' }}
         path: publish-${{ matrix.apiver }}
@@ -58,7 +58,7 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: stable
         check-latest: true
