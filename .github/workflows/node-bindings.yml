@@ -8,10 +8,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  id-token: write  # Required for OIDC
-  contents: read
-
 jobs:
   ci_checks:
     name: Build checks
@@ -21,6 +17,9 @@ jobs:
     name: Build Node.js bindings
     needs: ci_checks
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -38,14 +37,14 @@ jobs:
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 24
         cache: npm
         cache-dependency-path: bindings/node/package-lock.json
         registry-url: https://registry.npmjs.org/
 
-    # anchor to the smallest npm version supporting trusted publishing
+    # Node.js 24 uses npm 11
     - name: Update npm
-      run: npm install -g npm@11.5.1
+      run: npm install -g npm@11
 
     - name: Set up Go
       uses: actions/setup-go@v5
