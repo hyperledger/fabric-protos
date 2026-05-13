@@ -17,6 +17,9 @@ jobs:
     name: Build Node.js bindings
     needs: ci_checks
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read
 
     steps:
     - uses: actions/checkout@v5
@@ -34,10 +37,14 @@ jobs:
 
     - uses: actions/setup-node@v6
       with:
-        node-version: 20
+        node-version: 24
         cache: npm
         cache-dependency-path: bindings/node/package-lock.json
         registry-url: https://registry.npmjs.org/
+
+    # Node.js 24 uses npm 11
+    - name: Update npm
+      run: npm install -g npm@11
 
     - name: Set up Go
       uses: actions/setup-go@v6
@@ -65,4 +72,3 @@ jobs:
       env:
         NPM_CONFIG_DRY_RUN: ${{ ( github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true' ) && 'false' || 'true' }}
         NPM_PUBLISH_TAG: ${{ ( needs.ci_checks.outputs.publish_release == 'true' ) && 'next' || 'next-unstable' }}
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
