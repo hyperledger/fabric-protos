@@ -23,18 +23,18 @@ jobs:
 
     steps:
     - name: Checkout (build)
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
       with:
         path: build
 
     - name: Checkout (publish)
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
       with:
         repository: ${{ matrix.apiver == 'apiv1' && 'hyperledger/fabric-protos-go' || 'hyperledger/fabric-protos-go-apiv2' }}
         path: publish-${{ matrix.apiver }}
 
     - name: Cache apiv1 build dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       if: matrix.apiver == 'apiv1'
       env:
         cache-name: makefile-deps
@@ -46,7 +46,7 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-
 
     - name: Cache apiv2 build dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       if: matrix.apiver == 'apiv2'
       env:
         cache-name: makefile-deps
@@ -58,7 +58,7 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-
 
     - name: Set up Go
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: stable
         check-latest: true
