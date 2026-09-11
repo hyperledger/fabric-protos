@@ -48,6 +48,10 @@ jobs:
         distribution: temurin
         java-version: 21
 
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
     - name: Check package.json version
       working-directory: bindings/node
       run: |
@@ -63,6 +67,14 @@ jobs:
         echo "Expected version: ${BINDING_VERSION}"
         echo "pom.xml version: ${POM_VERSION}"
         [ "${POM_VERSION%-SNAPSHOT}" = "${BINDING_VERSION}" ] || exit 1
+
+    - name: Check pyproject.toml version
+      working-directory: bindings/python
+      run: |
+        PYTHON_BINDING_VERSION=$(python -c "from pathlib import Path; import tomllib; print(tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])")
+        echo "Expected version: ${BINDING_VERSION}"
+        echo "pyproject.toml version: ${PYTHON_BINDING_VERSION}"
+        [ "${PYTHON_BINDING_VERSION}" = "${BINDING_VERSION}" ] || exit 1
 
   lint:
     name: Lint

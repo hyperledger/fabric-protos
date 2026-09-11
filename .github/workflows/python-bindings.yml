@@ -1,0 +1,93 @@
+name: Python Bindings
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ v** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci_checks:
+    name: Build checks
+    uses: ./.github/workflows/ci-checks.yml
+
+  build:
+    name: Build Python bindings
+    needs: ci_checks
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Cache build dependencies
+      uses: actions/cache@v6
+      env:
+        cache-name: makefile-deps
+      with:
+        path: ~/.cache/fabric-protos
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Makefile') }}
+          ${{ runner.os }}-${{ env.cache-name }}-
+
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Run make
+      run: make pythonbindings
+
+    - name: Set prerelease version
+      if: needs.ci_checks.outputs.publish_release != 'true'
+      working-directory: bindings/python
+      env:
+        BINDING_VERSION: ${{ needs.ci_checks.outputs.binding_version }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+      run: |
+        python - <<'PY'
+        import os
+        from pathlib import Path
+
+        pyproject = Path('pyproject.toml')
+        content = pyproject.read_text(encoding='utf-8')
+        version = (
+            f"{os.environ['BINDING_VERSION']}.dev"
+            f"{os.environ['GITHUB_RUN_ID']}{os.environ['GITHUB_RUN_ATTEMPT']}"
+        )
+        pyproject.write_text(content.replace(
+            f"version = \"{os.environ['BINDING_VERSION']}\"",
+            f"version = \"{version}\"",
+            1,
+        ), encoding='utf-8')
+        print(version)
+        PY
+
+    - name: Install build dependencies
+      run: python -m pip install --upgrade build twine
+
+    - name: Build package
+      working-directory: bindings/python
+      run: python -m build
+
+    - name: Validate distribution metadata
+      working-directory: bindings/python
+      run: python -m twine check dist/*
+
+    - name: Publish to PyPI
+      if: github.event_name != 'pull_request' && needs.ci_checks.outputs.publish_release == 'true'
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: bindings/python/dist
+
+    - name: Upload build artifact
+      if: needs.ci_checks.outputs.publish_release != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-bindings-dist
+        path: bindings/python/dist/*
