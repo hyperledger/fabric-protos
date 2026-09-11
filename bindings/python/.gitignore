@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+.venv/
+
+# Generated bindings
+src/fabric_protos/common/
+src/fabric_protos/discovery/
+src/fabric_protos/gateway/
+src/fabric_protos/gossip/
+src/fabric_protos/ledger/
+src/fabric_protos/msp/
+src/fabric_protos/orderer/
+src/fabric_protos/peer/
+src/fabric_protos/transientstore/

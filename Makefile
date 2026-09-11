@@ -37,6 +37,7 @@ PROTOC_GEN_GRPC_JAVA_VERSION := 1.68.0
 PROTOC_GEN_JS_VERSION := 3.21.4
 GRPC_TOOLS_VERSION := 1.12.4
 TS_PROTOC_GEN_VERSION := 0.15.0
+GRPCIO_TOOLS_PYTHON_VERSION := 1.68.1
 
 # This is the commit hash for the https://github.com/googleapis/googleapis repo
 GRPC_STATUS_VERSION := 3597f7db2191c00b100400991ef96e52d62f5841
@@ -215,6 +216,16 @@ $(TS_PROTOC_GEN):
 	@mkdir -p $(dir $(TS_PROTOC_GEN))
 	@touch $(TS_PROTOC_GEN)
 
+# PYTHON_GRPC_TOOLS points to the marker file for the installed version.
+#
+# If GRPCIO_TOOLS_PYTHON_VERSION is changed, the package will be reinstalled.
+PYTHON_GRPC_TOOLS := $(CACHE_VERSIONS)/python-grpc-tools/$(GRPCIO_TOOLS_PYTHON_VERSION)
+$(PYTHON_GRPC_TOOLS):
+	python3 -m pip install --quiet --upgrade grpcio-tools==$(GRPCIO_TOOLS_PYTHON_VERSION)
+	@rm -rf $(dir $(PYTHON_GRPC_TOOLS))
+	@mkdir -p $(dir $(PYTHON_GRPC_TOOLS))
+	@touch $(PYTHON_GRPC_TOOLS)
+
 .DEFAULT_GOAL := all
 
 .PHONY: all
@@ -271,6 +282,10 @@ javabindings: genprotos
 nodebindings: genprotos
 	./scripts/generate_node_indexes.sh bindings/node/src
 	cd bindings/node && npm ci && npm run compile
+
+.PHONY: pythonbindings
+pythonbindings: $(PYTHON_GRPC_TOOLS)
+	./scripts/generate_python_bindings.sh
 
 .PHONY: scan
 scan: scan-go scan-java scan-node

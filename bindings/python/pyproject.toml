@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hyperledger-fabric-protos"
+version = "0.3.7"
+description = "Python bindings for Hyperledger Fabric protocol buffers"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+  { name = "hyperledger/fabric", email = "fabric@lists.hyperledger.org" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries"
+]
+dependencies = [
+  "protobuf>=5.27.0,<6.0.0",
+  "grpcio>=1.68.0,<2.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/hyperledger/fabric-protos"
+Repository = "https://github.com/hyperledger/fabric-protos"
+Issues = "https://github.com/hyperledger/fabric-protos/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fabric_protos = ["py.typed"]
