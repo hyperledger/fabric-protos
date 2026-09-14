@@ -47,11 +47,12 @@ if [[ $# -ne 1 ]]; then
   exit 2
 fi
 
-ROOT_DIR=$(realpath "$1")
+ROOT_DIR=${1:?}
 if [[ ! -d "${ROOT_DIR}" ]]; then
   echo "Invalid directory: ${ROOT_DIR}" >&2
   exit 2
 fi
+ROOT_DIR="$(cd "${ROOT_DIR}" && pwd)"
 
 ROOT_MARKER="${ROOT_DIR}/__init__.py"
 if [[ ! -f "${ROOT_MARKER}" ]]; then
