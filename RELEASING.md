@@ -8,8 +8,12 @@ The following artifacts are created or updated as a result of pushing changes to
 - npm module
     - [@hyperledger/fabric-protos](https://www.npmjs.com/package/@hyperledger/fabric-protos)
 - Java libraries
-    - GitHub packages: [fabric-protos](https://github.com/hyperledger/fabric-protos/packages/1412970)
-    - Maven central repository: [fabric-protos](https://search.maven.org/artifact/org.hyperledger.fabric/fabric-protos) (tagged release only)
+  - GitHub packages: [fabric-protos](https://github.com/hyperledger/fabric-protos/packages/1412970)
+  - Maven central repository: [fabric-protos](https://search.maven.org/artifact/org.hyperledger.fabric/fabric-protos) (tagged release only)
+- Python package
+  - PyPI: [hyperledger-fabric-protos](https://pypi.org/project/hyperledger-fabric-protos/) (tagged release only)
+
+**Note:** Python bindings are currently generated with `grpc_tools.protoc` and post-processing for package import normalization, rather than `buf generate` directly.
 
 ## Before releasing
 
@@ -55,5 +59,6 @@ The following files need to be modified when updating the version number, and th
 - The `version` element in `bindings/java/pom.xml`
 - The `version` property in `bindings/node/package.json`
   (The `bindings/node/package-lock.json` should also be updated with the new version.)
+- The `version` field in `bindings/python/pyproject.toml`
 
 **Note:** there is no file to update for the Go bindings, since these are versioned by the release tag.
