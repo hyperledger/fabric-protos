@@ -39,4 +39,4 @@ python3 -m grpc_tools.protoc \
   --grpc_python_out="${OUT_DIR}" \
   "${PROTO_FILES[@]}"
 
-python3 "${ROOT_DIR}/scripts/fix_python_imports.py" "${OUT_DIR}"
+bash "${ROOT_DIR}/scripts/fix_python_imports.sh" "${OUT_DIR}"
