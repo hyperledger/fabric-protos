@@ -80,13 +80,13 @@ jobs:
       run: python -m twine check dist/*
 
     - name: Publish to PyPI
-      if: github.event_name != 'pull_request' && needs.ci_checks.outputs.publish_release == 'true'
+      if: github.ref == 'refs/heads/main' || needs.ci_checks.outputs.publish_release == 'true'
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         packages-dir: bindings/python/dist
 
     - name: Upload build artifact
-      if: needs.ci_checks.outputs.publish_release != 'true'
+      if: github.ref != 'refs/heads/main' && needs.ci_checks.outputs.publish_release != 'true'
       uses: actions/upload-artifact@v4
       with:
         name: python-bindings-dist
