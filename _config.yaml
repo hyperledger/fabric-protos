@@ -1,0 +1,20 @@
+theme: minima
+title: "fabric-protos"
+header_pages:
+  - protos.md
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+
+optional_front_matter:
+  remove_originals: true
+
+plugins:
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+  - jekyll-relative-links
