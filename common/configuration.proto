@@ -18,11 +18,21 @@ message HashingAlgorithm {
 }
 
 // BlockDataHashingStructure is encoded into the configuration transaction as a configuration item of
-// type Chain with a Key of "BlockDataHashingStructure" and a Value of HashingAlgorithm as marshaled protobuf bytes
+// type Chain with a Key of "BlockDataHashingStructure" and a Value of BlockDataHashingStructure as
+// marshaled protobuf bytes. It describes how the block header DataHash is computed from the block data.
 message BlockDataHashingStructure {
-    // width specifies the width of the Merkle tree to use when computing the BlockDataHash
-    // in order to replicate flat hashing, set this width to MAX_UINT32
+    // width was reserved for a tree-based (e.g. Merkle) hashing structure, which was never implemented.
+    // Implementations currently accept only MAX_UINT32, which denotes flat (non-tree) hashing of the
+    // block data. New hashing schemes should be selected by name rather than by width.
     uint32 width  = 1;
+
+    // name selects the block data hashing scheme. Each name identifies a single, fully specified
+    // algorithm with no tunable parameters, so that every node that agrees on the name computes the
+    // same DataHash. New schemes (for example a length-prefixed, chunked, or Merkle tree hash) are
+    // introduced under new names.
+    // An empty name denotes the implementation's original flat hashing scheme, so existing
+    // configurations keep their current meaning.
+    string name = 2;
 }
 
 // OrdererAddresses is encoded into the configuration transaction as a configuration item of type Chain
